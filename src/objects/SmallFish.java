@@ -14,21 +14,19 @@ public class SmallFish extends GameCharacter {
 		return sf;
 	}
 	
-	public void resetState() {
-        // TODO: repor campos concretos da classe, por exemplo:
-        // this.setAlive(true);
-        // this.setSelected(false);
-        // this.clearCarriedObjects();
-    }
-	
 	@Override
 	public String getName() {
-		return "smallFishLeft";
+		return facingRight ? "smallFishRight" : "smallFishLeft";
 	}
 
 	@Override
 	public int getLayer() {
 		return 1;
+	}
+	
+	@Override
+	public boolean isPassable(GameObject passer) {
+	    return false;
 	}
 
 }

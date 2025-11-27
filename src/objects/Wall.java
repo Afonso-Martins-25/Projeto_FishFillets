@@ -2,22 +2,11 @@ package objects;
 
 import pt.iscte.poo.game.Room;
 
-
-public class Wall extends GameObject {
+public class Wall extends SolidObjects {
 
 	public Wall(Room room) {
 		super(room);
 	}
-	
-	@Override
-    public boolean supportsObject(GameObject obj) {
-        return true;
-    }
-
-    @Override
-    public boolean canBeTraversedBy(GameObject mover) {
-        return false;
-    }
 
 	@Override
 	public String getName() {
@@ -27,6 +16,11 @@ public class Wall extends GameObject {
 	@Override
 	public int getLayer() {
 		return 1;
+	}
+	
+	@Override
+	public boolean isPassable(GameObject passer) {
+	    return false;
 	}
 
 }

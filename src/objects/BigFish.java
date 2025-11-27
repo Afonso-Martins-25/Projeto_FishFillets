@@ -14,20 +14,18 @@ public class BigFish extends GameCharacter {
 		return bf;
 	}
 	
-	public void resetState() {
-        // TODO: repor campos concretos da classe, por exemplo:
-        // this.setAlive(true);
-        // this.setSelected(false);
-        // this.clearCarriedObjects();
-    }
-	
 	@Override
 	public String getName() {
-		return "bigFishLeft";
+		return facingRight ? "bigFishRight" : "bigFishLeft";
 	}
 
 	@Override
 	public int getLayer() {
 		return 1;
+	}
+	
+	@Override
+	public boolean isPassable(GameObject passer) {
+	    return false;
 	}
 }

@@ -1,19 +1,12 @@
 package objects;
 
 import pt.iscte.poo.game.Room;
-import pt.iscte.poo.utils.Point2D;
 
 public class Water extends GameObject{
 
-	public Water(Room room) { 
-		super(room); 
+	public Water(Room room) {
+		super(room);
 	}
-	
-
-    @Override
-    public boolean canBeTraversedBy(GameObject mover) {
-        return true;
-    }
 
 	@Override
 	public String getName() {
@@ -24,6 +17,25 @@ public class Water extends GameObject{
 	public int getLayer() {
 		return 0;
 	}
+	@Override
+	public boolean isSolid() {
+        return false;
+    }
 	
+	public boolean isPassable(GameObject passer) {
+	    return true;  // objetos passaveis
+	}
+
+	@Override
+	public boolean hasGravity() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isPushable() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

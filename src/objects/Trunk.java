@@ -1,25 +1,22 @@
 package objects;
 import pt.iscte.poo.game.Room;
-import pt.iscte.poo.utils.Vector2D;
 
 
-public class Rock extends HeavyObjects {
+public class Trunk extends SolidObjects {
 		
 	
-	public Rock(Room r) {
+	public Trunk(Room r) {
 		super(r);
 	}
 	
 	@Override
 	public String getName() {
-		return "stone";
+		return "trunk";
 	}
 
 	@Override
 	public int getLayer() {
 		return 1;
 	}
-	
-
-	 
 }
+

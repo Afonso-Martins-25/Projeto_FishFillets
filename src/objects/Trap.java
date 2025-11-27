@@ -1,26 +1,31 @@
 package objects;
-
 import pt.iscte.poo.game.Room;
 
-public class SteelHorizontal extends SolidObjects {
 
-	public SteelHorizontal(Room room) {
-		super(room);
+public class Trap extends HeavyObjects {
+		
+	
+	public Trap(Room r) {
+		super(r);
 	}
-
+	
 	@Override
 	public String getName() {
-		return "steelHorizontal";
+		return "trap";
 	}
 
 	@Override
 	public int getLayer() {
 		return 1;
 	}
-	
 	@Override
 	public boolean isPassable(GameObject passer) {
-	    return false;
+	    if(passer instanceof SmallFish)
+	    	return true;
+		
+		return false;  // objetos passaveis
 	}
-
+	
+	
 }
+

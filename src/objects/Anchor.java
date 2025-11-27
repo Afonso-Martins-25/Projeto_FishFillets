@@ -1,18 +1,15 @@
 package objects;
 import pt.iscte.poo.game.Room;
-import pt.iscte.poo.utils.Vector2D;
 
-
-public class Rock extends HeavyObjects {
-		
+public class Anchor extends HeavyObjects {
 	
-	public Rock(Room r) {
+	public Anchor(Room r) {
 		super(r);
 	}
 	
 	@Override
 	public String getName() {
-		return "stone";
+		return "anchor";
 	}
 
 	@Override
@@ -20,6 +17,5 @@ public class Rock extends HeavyObjects {
 		return 1;
 	}
 	
-
-	 
+	
 }
