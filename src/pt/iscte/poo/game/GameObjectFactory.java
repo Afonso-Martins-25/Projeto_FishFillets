@@ -38,10 +38,7 @@ public final class GameObjectFactory {
             	SteelVertical v = new SteelVertical(room);
                 return v;
             }
-            case 'C': {
-            	Cup cp = new Cup(room);
-                return cp;
-            }
+            
             case 'R': {
             	Rock r = new Rock(room);
             	return r;
