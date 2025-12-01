@@ -1,7 +1,7 @@
 package objects;
 import pt.iscte.poo.game.Room;
 
-public class SteelVertical extends SolidObjects {
+public class SteelVertical extends GameObject {
 	
 	public SteelVertical(Room r) {
 		super(r);
@@ -17,8 +17,4 @@ public class SteelVertical extends SolidObjects {
 		return 1;
 	}
 	
-	@Override
-	public boolean isPassable(GameObject passer) {
-	    return false;
-	}
 }

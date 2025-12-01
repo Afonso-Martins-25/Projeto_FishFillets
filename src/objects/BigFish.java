@@ -14,6 +14,24 @@ public class BigFish extends GameCharacter {
 		return bf;
 	}
 	
+	public boolean checkSupport() {
+	    int countLeves = 0;
+	    int countPesados = 0;
+	    for (GameObject obj : room.getObjects()) {
+	        if (obj.getPosition().getX() == getPosition().getX() &&
+	            obj.getPosition().getY() < getPosition().getY()) {
+	            if (obj instanceof Cup || obj instanceof Bomb) countLeves++;
+	            if (obj instanceof Rock || obj instanceof Anchor || obj instanceof Trap) countPesados++;
+	        }
+	    }
+	    // BigFish suporta vários leves ou 1 pesado
+	    if (countPesados > 1 || (countPesados == 1 && countLeves > 0)) {
+	        room.getEngine().restartCurrentLevel();
+	        return false;
+	    }
+	    return true;
+	}
+	
 	@Override
 	public String getName() {
 		return facingRight ? "bigFishRight" : "bigFishLeft";
@@ -24,8 +42,4 @@ public class BigFish extends GameCharacter {
 		return 1;
 	}
 	
-	@Override
-	public boolean isPassable(GameObject passer) {
-	    return false;
-	}
 }

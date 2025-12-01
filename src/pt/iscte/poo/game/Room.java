@@ -14,6 +14,7 @@ import objects.Cup;
 import objects.GameCharacter;
 import objects.GameObject;
 import objects.HoledWall;
+import objects.Pushable;
 import objects.Rock;
 import objects.SmallFish;
 import objects.SteelHorizontal;
@@ -35,7 +36,6 @@ public class Room {
 	private final int HEIGHT = 10;
 	private final int LENGTH = 10;
 											// 25/11/2025
-	// private GameCharacter activeFish;
     private SmallFish smallFish = SmallFish.getInstance();
     private BigFish bigFish = BigFish.getInstance();
     private int currentLevelNumber = 0; // rastreia room0, room1, etc.
@@ -43,14 +43,6 @@ public class Room {
 	public Room() {
 		objects = new ArrayList<GameObject>();
 	}
-											// 25/11/2025
-//	public SmallFish getSmallFish() {
-//        return smallFish;
-//    }
-//
-//    public BigFish getBigFish() {
-//        return bigFish;
-//    }
     
     public int getCurrentLevelNumber() {
         return currentLevelNumber;
@@ -147,7 +139,7 @@ public class Room {
 				switch(c) {
 				
 				
-			case 'W':     //Wall	    // 25/11/2025
+			case 'W':     //Wall
 				GameObject wall = new Wall(r);
 				wall.setPosition(x,y);
 				r.addObject(wall);
@@ -233,11 +225,6 @@ public class Room {
         return r;		
     }
 	
-	public void checkLevelCompletion() {    // 25/11/2025
-        if (smallFish.isExited() && bigFish.isExited()) {
-            engine.loadNextLevel();
-        }
-    }
 	
 	public boolean isPositionPassable(Point2D pos, GameObject passer) {
 	    for (GameObject obj : getObjects()) {
@@ -261,30 +248,60 @@ public class Room {
     }
     
     
+	public void checkLevelCompletion() {    // 25/11/2025
+		if (smallFish.isExited() && bigFish.isExited()) {
+	     engine.loadNextLevel();
+		}
+	}      // usado no move gameCharacter não deixa criar o ciclo infinito e inicia proximo nivel.
+    
     public void updateLevel(GameObject f1,GameObject f2) {
     	if(f1.getPosition().getX() > LENGTH && f2.getPosition().getY() > HEIGHT) {
-    		//engine.NextLevel();
+    		engine.loadNextLevel();
     	}
-    }
+    }  // usado no procesTick gameEngine
     
     
-    // Verifica se o objeto tem suporte por baixo 
+    
+//    // Verifica se o objeto tem suporte por baixo 
+//    private boolean hasSupport(GameObject obj) {
+//        Point2D pos = obj.getPosition();
+//        Point2D below = new Point2D(pos.getX(), pos.getY() + 1);
+//        
+//        // Se estiver no chão (por exemplo limite da sala)
+//        if (below.getY() >= HEIGHT) {
+//            return true;
+//        }
+//
+//        for (GameObject other : objects) {
+//            if (other == obj) continue;
+//            if (other.getPosition().equals(below) && other.is()) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+    
     private boolean hasSupport(GameObject obj) {
         Point2D pos = obj.getPosition();
         Point2D below = new Point2D(pos.getX(), pos.getY() + 1);
-        
-        // Se estiver no chão (por exemplo limite da sala)
-        if (below.getY() >= HEIGHT) {
-            return true;
-        }
 
-        for (GameObject other : objects) {
-            if (other == obj) continue;
-            if (other.getPosition().equals(below) && other.isSolid()) {
-                return true;
-            }
-        }
-        return false;
+        // Chão da grelha → tem suporte
+        if (below.getY() >= HEIGHT)
+            return true;
+
+        // Objeto na layer mais alta na posição abaixo
+        GameObject under = getTopObjectAt(below);
+
+        // Não existe nada → não tem suporte → cai
+        if (under == null)
+            return false;
+
+        // Água nunca dá suporte (mesmo que seja top layer)
+        if (under instanceof Water)
+            return false;
+
+        // Se o objeto abaixo NÃO for passável pelo objeto que está a cair → é suporte
+        return !under.isPassable(obj);
     }
     
     
@@ -294,8 +311,9 @@ public class Room {
         obj.setPosition(pos.getX(), pos.getY() + 1);
     }
 	
-	// devolve o objecto da layer mais alta nessa posição (pode ser Water se for o único)
+    // devolve o objecto da layer mais alta nessa posição
     public GameObject getTopObjectAt(Point2D pos) {
+        if (!isInBounds(pos)) return null;
         GameObject top = null;
         for (GameObject obj : objects) {
             if (obj.getPosition().equals(pos)) {
@@ -306,45 +324,61 @@ public class Room {
         }
         return top;
     }
-
+    
+    // Validar destino antes de procurar objetos ^
     private boolean isInBounds(Point2D pos) {
         if (pos == null) return false;
-        int x = (int) pos.getX(), y = (int) pos.getY();
+        int x = pos.getX(), y = pos.getY();
         return x >= 0 && x < LENGTH && y >= 0 && y < HEIGHT;
     }
-
-	 // tentativa de empurrar o objecto na posição pos em direcção dir
-    // suporta empurrar em cadeia (recursivo)
+    
+//
+//	 // tentativa de empurrar o objecto na posição pos em direcção dir
+//    // suporta empurrar em cadeia (recursivo)
+//    public boolean tryPushObjectAt(Point2D pos, Vector2D dir, GameObject pusher) {
+//        if (!isInBounds(pos)) return false; // nada a empurrar fora dos limites
+//        GameObject obj = getTopObjectAt(pos);
+//        if (obj == null) return false;
+//        if (!obj.isPushable()) return false;
+//
+//        Point2D nextPos = pos.plus(dir);
+//        if (!isInBounds(nextPos)) return false; // não empurrar para fora da sala
+//
+//        GameObject destTop = getTopObjectAt(nextPos);
+//
+//        // se destino tem objecto e é pushable, empurra esse primeiro (cadeia)
+//        if (destTop != null && destTop != obj && !destTop.isPassable(obj)) {
+//            if (destTop.isPushable()) {
+//                if (!tryPushObjectAt(nextPos, dir, pusher)) {
+//                    return false; // não foi possível empurrar cadeia
+//                }
+//            } else {
+//                // se não puder empurrar e não for passável para o obj, bloqueado
+//                if (!destTop.isPassable(obj)) return false;
+//            }
+//
+//			}
+//
+//        // se chegou aqui, podemos mover o obj para nextPos
+//        obj.setPosition(nextPos);
+//     // chamar hook para efeitos especiais (ex.: bomba explode)
+//        obj.onPushedBy(pusher, dir);
+//        if (engine != null) engine.updateGUI();
+//        return true;
+//    }
+    
+    // tentativa de empurrar o objecto na posição pos em direcção dir
     public boolean tryPushObjectAt(Point2D pos, Vector2D dir, GameObject pusher) {
-        if (!isInBounds(pos)) return false; // nada a empurrar fora dos limites
-        GameObject obj = getTopObjectAt(pos);
-        if (obj == null) return false;
-        if (!obj.isPushable()) return false;
-
-        Point2D nextPos = pos.plus(dir);
-        if (!isInBounds(nextPos)) return false; // não empurrar para fora da sala
-
-        GameObject destTop = getTopObjectAt(nextPos);
-
-        // se destino tem objecto e é pushable, empurra esse primeiro (cadeia)
-        if (destTop != null && destTop != obj && !destTop.isPassable(obj)) {
-            if (destTop.isPushable()) {
-                if (!tryPushObjectAt(nextPos, dir, pusher)) {
-                    return false; // não foi possível empurrar cadeia
+        for (GameObject obj : objects) {
+            if (obj.getPosition().equals(pos) && obj instanceof Pushable) {
+                Pushable pushable = (Pushable) obj;
+                if (pushable.isPushable()) {
+                    return pushable.push(dir, pusher);
                 }
-            } else {
-                // se não puder empurrar e não for passável para o obj, bloqueado
-                if (!destTop.isPassable(obj)) return false;
             }
-
-			}
-
-        // se chegou aqui, podemos mover o obj para nextPos
-        obj.setPosition(nextPos);
-     // chamar hook para efeitos especiais (ex.: bomba explode)
-        obj.onPushedBy(pusher, dir);
-        if (engine != null) engine.updateGUI();
-        return true;
+        }
+        return false;
     }
+    
 
 }

@@ -2,7 +2,7 @@ package objects;
 import pt.iscte.poo.game.Room;
 
 
-public class HoledWall extends SolidObjects {
+public class HoledWall extends GameObject {
 		
 	
 	public HoledWall(Room r) {
@@ -21,8 +21,8 @@ public class HoledWall extends SolidObjects {
 	
 	@Override
 	public boolean isPassable(GameObject passer) {
-		if (passer instanceof SmallFish) {
-	        return true;  // pequeno pode passar
+		if (passer instanceof SmallFish || passer instanceof Cup) {
+	        return true;  // pequeno e cup pode passar
 	    } else {
 	        return false; // grande não pode passar
 	    }

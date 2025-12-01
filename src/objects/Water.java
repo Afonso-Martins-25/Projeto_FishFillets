@@ -17,25 +17,10 @@ public class Water extends GameObject{
 	public int getLayer() {
 		return 0;
 	}
-	@Override
-	public boolean isSolid() {
-        return false;
-    }
 	
+	@Override
 	public boolean isPassable(GameObject passer) {
-	    return true;  // objetos passaveis
-	}
-
-	@Override
-	public boolean hasGravity() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isPushable() {
-		// TODO Auto-generated method stub
-		return false;
+	    return true;
 	}
 
 }

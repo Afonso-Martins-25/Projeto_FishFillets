@@ -1,8 +1,9 @@
 package objects;
 import pt.iscte.poo.game.Room;
 
+//falta fazer destruição
 
-public class Trunk extends SolidObjects {
+public class Trunk extends GameObject {
 		
 	
 	public Trunk(Room r) {

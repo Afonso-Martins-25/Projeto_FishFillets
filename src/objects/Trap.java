@@ -2,7 +2,9 @@ package objects;
 import pt.iscte.poo.game.Room;
 
 
-public class Trap extends HeavyObjects {
+//falta coisas
+
+public class Trap extends MovableObjects {
 		
 	
 	public Trap(Room r) {
@@ -18,12 +20,25 @@ public class Trap extends HeavyObjects {
 	public int getLayer() {
 		return 1;
 	}
+	
 	@Override
 	public boolean isPassable(GameObject passer) {
-	    if(passer instanceof SmallFish)
-	    	return true;
-		
-		return false;  // objetos passaveis
+		if (passer instanceof SmallFish) {
+	        return true;  // pequeno pode passar
+	    } else {
+	        return true; // se for do peixe grande mata falta fazer
+	    }
+
+	}
+	
+	@Override
+	public  boolean isPushable() {
+        return false;
+	}
+
+	@Override
+	public boolean isHeavy() {
+		return true;
 	}
 	
 	

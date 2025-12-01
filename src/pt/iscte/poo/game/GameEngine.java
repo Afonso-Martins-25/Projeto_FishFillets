@@ -73,13 +73,17 @@ public class GameEngine implements Observer {
 		
 		  if (currentRoom != null) {
 		        currentRoom.updateFallingObjects();  // chama a lógica que faz os móveis caírem
-		        currentRoom.updateLevel(inactiveFish, activeFish);
+	//	        currentRoom.updateLevel(inactiveFish, activeFish);
+	//	        currentRoom.checkLevelCompletion();
 		        
 		  }
 		    
 		    updateGUI();
 	}
 
+	
+	
+	// loadnextlevel semelhante a restart sugest criar um load(level)
 	
 	public void loadNextLevel() {
         currentLevelNumber++;
@@ -118,32 +122,37 @@ public class GameEngine implements Observer {
     }
 	
 	public void restartCurrentLevel() {
-        if (currentRoom == null) return;
-        
-        String currentRoomName = "room" + currentLevelNumber + ".txt";
-        currentRoom = rooms.get(currentRoomName);
-        
-        // Resetar estado dos peixes
-        SmallFish.getInstance().setRoom(currentRoom);
-        BigFish.getInstance().setRoom(currentRoom);
-        SmallFish.getInstance().hasExited = false;
-        BigFish.getInstance().hasExited = false;
-        
-        // Reposicionar na saída do ficheiro
-        if (currentRoom.getSmallFishStartingPosition() != null) {
-            SmallFish.getInstance().setPosition(currentRoom.getSmallFishStartingPosition());
-        }
-        if (currentRoom.getBigFishStartingPosition() != null) {
-            BigFish.getInstance().setPosition(currentRoom.getBigFishStartingPosition());
-        }
-        
-        // Resetar peixe ativo
-        activeFish = SmallFish.getInstance();
-        inactiveFish = BigFish.getInstance();
-        
-        updateGUI();
-        ImageGUI.getInstance().setStatusMessage("Nivel reiniciado");
-    }
+
+	    String currentRoomName = "room" + currentLevelNumber + ".txt";
+	    File roomFile = new File("./rooms/" + currentRoomName);
+
+	    // Recarregar Room
+	    Room reloadedRoom = Room.readRoom(roomFile, this);
+
+	    rooms.put(currentRoomName, reloadedRoom);
+	    currentRoom = reloadedRoom;
+
+	    // Resetar estado dos peixes
+	    SmallFish.getInstance().setRoom(currentRoom);
+	    BigFish.getInstance().setRoom(currentRoom);
+	    SmallFish.getInstance().hasExited = false;
+	    BigFish.getInstance().hasExited = false;
+
+	    if (currentRoom.getSmallFishStartingPosition() != null) {
+	        SmallFish.getInstance().setPosition(currentRoom.getSmallFishStartingPosition());
+	    }
+	    if (currentRoom.getBigFishStartingPosition() != null) {
+	        BigFish.getInstance().setPosition(currentRoom.getBigFishStartingPosition());
+	    }
+
+	    activeFish = SmallFish.getInstance();
+	    inactiveFish = BigFish.getInstance();
+
+	    updateGUI();
+	    ImageGUI.getInstance().setStatusMessage("Nivel reiniciado");
+	}
+
+
 	
 	public void switchActiveFish() {
         // Validar que o outro peixe não saiu

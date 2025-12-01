@@ -2,7 +2,7 @@ package objects;
 
 import pt.iscte.poo.game.Room;
 
-public class SteelHorizontal extends SolidObjects {
+public class SteelHorizontal extends GameObject {
 
 	public SteelHorizontal(Room room) {
 		super(room);
@@ -18,9 +18,5 @@ public class SteelHorizontal extends SolidObjects {
 		return 1;
 	}
 	
-	@Override
-	public boolean isPassable(GameObject passer) {
-	    return false;
-	}
 
 }

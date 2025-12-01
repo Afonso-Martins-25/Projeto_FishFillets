@@ -2,8 +2,9 @@ package objects;
 import pt.iscte.poo.game.Room;
 import pt.iscte.poo.utils.Vector2D;
 
+// passa parede com buraco tbm falta acho que fiz 1/12/25
 
-public class Cup extends LightObjects {
+public class Cup extends MovableObjects {
 	
 	public Cup(Room r) {
 		super(r);
@@ -16,7 +17,13 @@ public class Cup extends LightObjects {
 
 	@Override
 	public int getLayer() {
-		return 1;
+		return 3;  //1/12
+	}
+
+	@Override
+	public boolean isHeavy() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	

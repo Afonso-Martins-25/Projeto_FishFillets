@@ -3,7 +3,9 @@ import pt.iscte.poo.game.Room;
 import pt.iscte.poo.utils.Vector2D;
 
 
-public class Rock extends HeavyObjects {
+//o carangueijo sai daqui
+
+public class Rock extends MovableObjects {
 		
 	
 	public Rock(Room r) {
@@ -18,6 +20,11 @@ public class Rock extends HeavyObjects {
 	@Override
 	public int getLayer() {
 		return 1;
+	}
+
+	@Override
+	public boolean isHeavy() {
+		return true;
 	}
 	
 
