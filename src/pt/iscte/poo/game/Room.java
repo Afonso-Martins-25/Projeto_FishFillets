@@ -241,11 +241,12 @@ public class Room {
 	// Atualiza o estado dos objetos móveis, fazendo-os cair se não houver suporte
     public void updateFallingObjects() {
         for (GameObject obj : objects) {
-            if (obj.hasGravity() && !hasSupport(obj)) {
-                fall(obj);
+            if (obj.hasGravity() && obj.hasSupport()== false) {
+                obj.fall();
             }
         }
     }
+
     
     
 	public void checkLevelCompletion() {    // 25/11/2025
@@ -254,62 +255,16 @@ public class Room {
 		}
 	}      // usado no move gameCharacter não deixa criar o ciclo infinito e inicia proximo nivel.
     
-    public void updateLevel(GameObject f1,GameObject f2) {
-    	if(f1.getPosition().getX() > LENGTH && f2.getPosition().getY() > HEIGHT) {
-    		engine.loadNextLevel();
-    	}
-    }  // usado no procesTick gameEngine
     
     
     
-//    // Verifica se o objeto tem suporte por baixo 
-//    private boolean hasSupport(GameObject obj) {
-//        Point2D pos = obj.getPosition();
-//        Point2D below = new Point2D(pos.getX(), pos.getY() + 1);
-//        
-//        // Se estiver no chão (por exemplo limite da sala)
-//        if (below.getY() >= HEIGHT) {
-//            return true;
-//        }
-//
-//        for (GameObject other : objects) {
-//            if (other == obj) continue;
-//            if (other.getPosition().equals(below) && other.is()) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
     
-    private boolean hasSupport(GameObject obj) {
-        Point2D pos = obj.getPosition();
-        Point2D below = new Point2D(pos.getX(), pos.getY() + 1);
 
-        // Chão da grelha → tem suporte
-        if (below.getY() >= HEIGHT)
-            return true;
-
-        // Objeto na layer mais alta na posição abaixo
-        GameObject under = getTopObjectAt(below);
-
-        // Não existe nada → não tem suporte → cai
-        if (under == null)
-            return false;
-
-        // Água nunca dá suporte (mesmo que seja top layer)
-        if (under instanceof Water)
-            return false;
-
-        // Se o objeto abaixo NÃO for passável pelo objeto que está a cair → é suporte
-        return !under.isPassable(obj);
-    }
     
     
- // Faz o objeto cair uma unidade para baixo
-    private void fall(GameObject obj) {
-        Point2D pos = obj.getPosition();
-        obj.setPosition(pos.getX(), pos.getY() + 1);
-    }
+    
+    
+ 
 	
     // devolve o objecto da layer mais alta nessa posição
     public GameObject getTopObjectAt(Point2D pos) {
@@ -332,40 +287,7 @@ public class Room {
         return x >= 0 && x < LENGTH && y >= 0 && y < HEIGHT;
     }
     
-//
-//	 // tentativa de empurrar o objecto na posição pos em direcção dir
-//    // suporta empurrar em cadeia (recursivo)
-//    public boolean tryPushObjectAt(Point2D pos, Vector2D dir, GameObject pusher) {
-//        if (!isInBounds(pos)) return false; // nada a empurrar fora dos limites
-//        GameObject obj = getTopObjectAt(pos);
-//        if (obj == null) return false;
-//        if (!obj.isPushable()) return false;
-//
-//        Point2D nextPos = pos.plus(dir);
-//        if (!isInBounds(nextPos)) return false; // não empurrar para fora da sala
-//
-//        GameObject destTop = getTopObjectAt(nextPos);
-//
-//        // se destino tem objecto e é pushable, empurra esse primeiro (cadeia)
-//        if (destTop != null && destTop != obj && !destTop.isPassable(obj)) {
-//            if (destTop.isPushable()) {
-//                if (!tryPushObjectAt(nextPos, dir, pusher)) {
-//                    return false; // não foi possível empurrar cadeia
-//                }
-//            } else {
-//                // se não puder empurrar e não for passável para o obj, bloqueado
-//                if (!destTop.isPassable(obj)) return false;
-//            }
-//
-//			}
-//
-//        // se chegou aqui, podemos mover o obj para nextPos
-//        obj.setPosition(nextPos);
-//     // chamar hook para efeitos especiais (ex.: bomba explode)
-//        obj.onPushedBy(pusher, dir);
-//        if (engine != null) engine.updateGUI();
-//        return true;
-//    }
+
     
     // tentativa de empurrar o objecto na posição pos em direcção dir
     public boolean tryPushObjectAt(Point2D pos, Vector2D dir, GameObject pusher) {

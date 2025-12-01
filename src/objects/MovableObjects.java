@@ -1,6 +1,7 @@
 package objects;
 
 import pt.iscte.poo.game.Room;
+import pt.iscte.poo.utils.Point2D;
 import pt.iscte.poo.utils.Vector2D;
 
 //implementa a interface pushable
@@ -33,6 +34,8 @@ public abstract class MovableObjects extends GameObject implements Pushable{
 	// Apenas bombas utilizam
 	public void onExplode(Room room) {}
 	
+	
+	
 	@Override
     public boolean isPushable() {
         return true;
@@ -55,6 +58,8 @@ public abstract class MovableObjects extends GameObject implements Pushable{
 	public boolean isPassable(GameObject passer) {
 	    return false;
 	}
+	
+	
 	
 	
 	

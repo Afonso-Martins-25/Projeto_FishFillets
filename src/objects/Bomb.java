@@ -26,19 +26,5 @@ public class Bomb extends MovableObjects {
 	}
 	
 	
-	// explode depois de movida
 	
-	/*public void onPushedBy(GameObject pusher, Vector2D dir) {
-	    explode(); // implementa a lógica de explosão
-	}
-
-	// ou: impedir/alterar movimento antes de chamar super
-	@Override
-	public boolean push(Vector2D dir) {
-	    if (shouldExplodeImmediately()) {
-	        explode();
-	        return false; // não se move
-	    }
-	    return super.push(dir); // delega para Room
-	}*/
 }

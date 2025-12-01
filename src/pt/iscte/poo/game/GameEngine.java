@@ -73,7 +73,6 @@ public class GameEngine implements Observer {
 		
 		  if (currentRoom != null) {
 		        currentRoom.updateFallingObjects();  // chama a lógica que faz os móveis caírem
-	//	        currentRoom.updateLevel(inactiveFish, activeFish);
 	//	        currentRoom.checkLevelCompletion();
 		        
 		  }

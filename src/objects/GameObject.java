@@ -53,5 +53,36 @@ public abstract class GameObject implements ImageTile{
         return false;
 	}
 	
+	// Faz o objeto cair uma unidade para baixo
+    public void fall() {
+        Point2D pos = this.getPosition();
+        this.setPosition(pos.getX(), pos.getY() + 1);
+        
+    }
+    
+    public boolean hasSupport() {
+        Point2D pos = this.getPosition();
+        Point2D below = new Point2D(pos.getX(), pos.getY() + 1);
+
+        // Chão da grelha → tem suporte
+        if (below.getY() >= 10)
+            return true;
+
+        // Objeto na layer mais alta na posição abaixo
+        GameObject under = this.getRoom().getTopObjectAt(below);
+
+        // Não existe nada → não tem suporte → cai
+        if (under == null)
+            return false;
+
+        // Água nunca dá suporte (mesmo que seja top layer)
+        if (under instanceof Water)
+            return false;
+
+        // Se o objeto abaixo NÃO for passável pelo objeto que está a cair → é suporte
+        return !under.isPassable(this);
+    }
+
+	
        
 }
