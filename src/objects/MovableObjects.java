@@ -1,6 +1,7 @@
 package objects;
 
 import pt.iscte.poo.game.Room;
+import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
 import pt.iscte.poo.utils.Vector2D;
 
@@ -19,7 +20,6 @@ public abstract class MovableObjects extends GameObject implements Pushable{
 		return true;
 	}
 	
-	//falta atribuir os leves e pesados
 	public abstract boolean isHeavy(); 
 
 	// Chamado quando o objeto se move para baixo
@@ -53,11 +53,13 @@ public abstract class MovableObjects extends GameObject implements Pushable{
         }
         return false;
     }
+    
 	
 	@Override
 	public boolean isPassable(GameObject passer) {
 	    return false;
 	}
+	
 	
 	
 	

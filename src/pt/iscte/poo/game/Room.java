@@ -10,6 +10,8 @@ import objects.Water;
 import objects.Anchor;
 import objects.BigFish;
 import objects.Bomb;
+import objects.Buoy;
+import objects.Crab;
 import objects.Cup;
 import objects.GameCharacter;
 import objects.GameObject;
@@ -212,7 +214,15 @@ public class Room {
 				hw.setPosition(x, y);
 				r.addObject(hw);
 				break;
+				
+			case 'F': //Buoy
+				GameObject buoy= new Buoy(r);
+				buoy.setPosition(x, y);
+				r.addObject(buoy);
+				break;
+				
 				//Pode adicionar mais objetos
+				
 				}
             }
 	    }
