@@ -78,10 +78,10 @@ public abstract class MovableObjects extends GameObject implements Pushable{
     }
     
 	
-	@Override
-	public boolean isPassable(GameObject passer) {
-	    return false;
-	}
+//	@Override
+//	public boolean isPassable(GameObject passer) {
+//	    return false;
+//	}
 	
 	
 	
