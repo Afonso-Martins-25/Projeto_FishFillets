@@ -27,6 +27,19 @@ public class Rock extends MovableObjects {
 		return true;
 	}
 	
+	@Override
+    public boolean canBePushedBy(GameObject pusher, Vector2D dir, Room room) {
+        // Pedra é pesada: SmallFish não consegue
+        if (pusher instanceof SmallFish) {
+            return false;
+        }
+        // BigFish consegue em qualquer direção
+        if (pusher instanceof BigFish) {
+            return true;
+        }
+        return false;
+    }
+	
 
 	 
 }

@@ -1,5 +1,6 @@
 package objects;
 import pt.iscte.poo.game.Room;
+import pt.iscte.poo.utils.Vector2D;
 
 
 //falta coisas
@@ -23,12 +24,7 @@ public class Trap extends MovableObjects {
 	
 	@Override
 	public boolean isPassable(GameObject passer) {
-		if (passer instanceof SmallFish) {
-	        return true;  // pequeno pode passar
-	    } else {
-	        return true; // se for do peixe grande mata falta fazer
-	    }
-
+		return true;
 	}
 	
 	@Override
@@ -39,6 +35,13 @@ public class Trap extends MovableObjects {
 	@Override
 	public boolean isHeavy() {
 		return true;
+	}
+	
+    // falta fazer
+	@Override
+	public boolean canBePushedBy(GameObject pusher, Vector2D dir, Room room) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	

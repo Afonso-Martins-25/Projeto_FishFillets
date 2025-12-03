@@ -20,6 +20,9 @@ public abstract class MovableObjects extends GameObject implements Pushable{
 		return true;
 	}
 	
+	// descreve obrigatoriamente os movimentos para cada um dos objetos que dela derivam 
+	public abstract boolean canBePushedBy(GameObject pusher, Vector2D dir, Room room);
+	
 	public abstract boolean isHeavy(); 
 
 	// Chamado quando o objeto se move para baixo
@@ -43,15 +46,35 @@ public abstract class MovableObjects extends GameObject implements Pushable{
 
     @Override      //interface
     public boolean push(Vector2D dir, GameObject pusher) {
-        // Lógica básica de empurrar: verifica se pode mover e move
-        Room room = getRoom();
-        if (room == null) return false;
-        // Verifica se a posição destino está livre
-        if (room.isPositionPassable(getPosition().plus(dir), this)) {
-            setPosition(getPosition().plus(dir));
-            return true;
+//        // Lógica básica de empurrar: verifica se pode mover e move
+//        Room room = getRoom();
+//        if (room == null) return false;
+//        // Verifica se a posição destino está livre
+//        if (room.isPositionPassable(getPosition().plus(dir), this)) {
+//            setPosition(getPosition().plus(dir));
+//            return true;
+//        }
+//        return false;
+    	
+    	Room room = getRoom();
+        if (room == null || dir == null) return false;
+
+        // pergunta ao objeto se pode ser empurrado
+        if (!canBePushedBy(pusher, dir, room)) {
+            return false;
         }
-        return false;
+
+        Point2D destination = getPosition().plus(dir);
+        
+        // verifica se destino está passável
+        if (!room.isPositionPassable(destination, this)) {
+            return false;
+        }
+
+        // move simplesmente
+        setPosition(destination);
+        room.getEngine().updateGUI();
+        return true;
     }
     
 	

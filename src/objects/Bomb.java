@@ -22,8 +22,17 @@ public class Bomb extends MovableObjects {
 
 	@Override
 	public boolean isHeavy() {
-		return true;
+		return false;
 	}
+	
+	@Override
+    public boolean canBePushedBy(GameObject pusher, Vector2D dir, Room room) {
+		
+        if (pusher instanceof SmallFish || pusher instanceof BigFish) {
+            return true;
+        }
+        return false;
+    }
 	
 	
 	

@@ -37,13 +37,27 @@ public abstract class GameCharacter extends GameObject {
 	    GameObject topObj = room.getTopObjectAt(destination);
 	    
 
+//	    if (topObj != null && topObj instanceof Pushable) {
+//	        // Tenta empurrar
+//	        if (!room.tryPushObjectAt(destination, dir, this)) {
+//	            return; // Não conseguiu empurrar
+//	        }
+//	    } else if (topObj != null && !topObj.isPassable(this)) {
+//	        return; // Não pode passar
+//	    }
+	    
 	    if (topObj != null && topObj instanceof Pushable) {
+	        // Se movimento é vertical, verifica carga acima
+	        if (isVerticalMove(dir)) {
+	            validateVerticalLoadOrDie(room);
+	        }
 	        // Tenta empurrar
 	        if (!room.tryPushObjectAt(destination, dir, this)) {
 	            return; // Não conseguiu empurrar
-	        }
+	            
+	        } 
 	    } else if (topObj != null && !topObj.isPassable(this)) {
-	        return; // Não pode passar
+		        return;
 	    }
 
 	    if (isOutOfBounds(destination)) {
@@ -57,6 +71,44 @@ public abstract class GameCharacter extends GameObject {
 	    setPosition(destination);
 	}
 	
+	//rever
+	private boolean isVerticalMove(Vector2D dir) {
+        return dir.equals(Direction.UP.asVector()) || dir.equals(Direction.DOWN.asVector());
+    }
+
+    private void validateVerticalLoadOrDie(Room room) {
+        if (this instanceof SmallFish) {
+            int leves = 0, pesados = 0;
+            Point2D check = getPosition().plus(Direction.UP.asVector());
+            while (check.getX() >= 0 && check.getX() < 10 && check.getY() >= 0 && check.getY() < 10) {
+                GameObject obj = room.getTopObjectAt(check);
+                if (obj instanceof MovableObjects) {
+                    MovableObjects m = (MovableObjects) obj;
+                    if (m.isHeavy()) pesados++; else leves++;
+                    check = check.plus(Direction.UP.asVector());
+                } else break;
+            }
+            if (pesados > 0 || leves > 1) {
+                room.getEngine().restartCurrentLevel();
+            }
+        } else if (this instanceof BigFish) {
+            int pesados = 0;
+            Point2D check = getPosition().plus(Direction.UP.asVector());
+            while (check.getX() >= 0 && check.getX() < 10 && check.getY() >= 0 && check.getY() < 10) {
+                GameObject obj = room.getTopObjectAt(check);
+                if (obj instanceof MovableObjects) {
+                    MovableObjects m = (MovableObjects) obj;
+                    if (m.isHeavy()) pesados++;
+                    check = check.plus(Direction.UP.asVector());
+                } else break;
+            }
+            if (pesados > 1) {
+                room.getEngine().restartCurrentLevel();
+            }
+        }
+    }
+    
+    //
 	
 	private boolean isOutOfBounds(Point2D pos) {
         if (pos == null) return true;

@@ -1,5 +1,6 @@
 package objects;
 import pt.iscte.poo.game.Room;
+import pt.iscte.poo.utils.Vector2D;
 
 
 
@@ -27,6 +28,13 @@ public class Buoy extends MovableObjects {
 
 	@Override  // confirmar
 	public boolean isHeavy() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	// falta fazer
+	@Override
+	public boolean canBePushedBy(GameObject pusher, Vector2D dir, Room room) {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -26,6 +26,15 @@ public class Cup extends MovableObjects {
 		return false;
 	}
 	
+	@Override
+    public boolean canBePushedBy(GameObject pusher, Vector2D dir, Room room) {
+        // Taça é leve, qualquer peixe pode empurrar em qualquer direção
+        if (pusher instanceof SmallFish || pusher instanceof BigFish) {
+            return true;
+        }
+        return false;
+    }
+	
 	
 
 	 
