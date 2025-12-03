@@ -40,7 +40,7 @@ public class GameEngine implements Observer {
 	private void loadGame() throws FileNotFoundException  {
 		File[] files = new File("./rooms").listFiles();
 		for(File f : files) {
-			rooms.put(f.getName(),Room.readRoom(f,this,currentLevelNumber));
+			rooms.put(f.getName(),Room.readRoom(f,this));
 		}
 	}
 
@@ -126,7 +126,7 @@ public class GameEngine implements Observer {
 	    File roomFile = new File("./rooms/" + currentRoomName);
 
 	    // Recarregar Room
-	    Room reloadedRoom = Room.readRoom(roomFile, this,currentLevelNumber);
+	    Room reloadedRoom = Room.readRoom(roomFile, this);
 
 	    rooms.put(currentRoomName, reloadedRoom);
 	    currentRoom = reloadedRoom;
