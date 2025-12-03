@@ -8,6 +8,8 @@ import java.util.Map;
 import objects.SmallFish;
 import objects.BigFish;
 import objects.GameCharacter;
+import objects.HighscoreManager;
+import objects.ScoreEntry;
 import pt.iscte.poo.gui.ImageGUI;
 import pt.iscte.poo.observer.Observed;
 import pt.iscte.poo.observer.Observer;
@@ -23,7 +25,10 @@ public class GameEngine implements Observer {
 	private GameCharacter activeFish;
 	private GameCharacter inactiveFish;
 	
+	private boolean gameFinished = false;
 	private int currentLevelNumber = 0;
+	private int totalMoves = 0;
+	private int totalTime = 0;
 	
 	
 	GameEngine() throws FileNotFoundException  {
@@ -35,6 +40,13 @@ public class GameEngine implements Observer {
 		BigFish.getInstance().setRoom(currentRoom);
 		activeFish = SmallFish.getInstance();  // começa com SmallFish ativo
 		inactiveFish = BigFish.getInstance();
+	}
+	
+	public static GameEngine getInstance() throws FileNotFoundException {
+		if(instance==null) {
+			instance=new GameEngine();
+		}
+		return instance;
 	}
 
 	private void loadGame() throws FileNotFoundException  {
@@ -57,7 +69,11 @@ public class GameEngine implements Observer {
                 restartCurrentLevel();
                 
             } else if (Direction.isDirection(k)) {
-                activeFish.move(Direction.directionFor(k).asVector());
+                try {
+					activeFish.move(Direction.directionFor(k).asVector());
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
             }
         }
 		
@@ -72,20 +88,28 @@ public class GameEngine implements Observer {
 		lastTickProcessed++;
 		
 		  if (currentRoom != null) {
-		        currentRoom.updateFallingObjects();  // chama a lógica que faz os móveis caírem
-	//	        currentRoom.checkLevelCompletion();
+			  if(!gameFinished) {
+				  currentRoom.updateFallingObjects();  // chama a lógica que faz os móveis caírem
+		          currentRoom.incrementTimeCount();
+			  }
+		        
 		        
 		  }
 		    
 		    updateGUI();
 	}
 
+
+
 	
 	
 	// loadnextlevel semelhante a restart sugest criar um load(level)
 	
-	public void loadNextLevel() {
-        currentLevelNumber++;
+	public void loadNextLevel() throws FileNotFoundException {
+		totalMoves += currentRoom.getMoveCount();
+		totalTime += currentRoom.getTimeCount();
+
+		currentLevelNumber++;
         String nextRoomName = "room" + currentLevelNumber + ".txt";
         
         if (!rooms.containsKey(nextRoomName)) {
@@ -166,26 +190,44 @@ public class GameEngine implements Observer {
         updateGUI();
     }
 	
-	private void endGame(int lastLevelCompleted) {
-        ImageGUI.getInstance().showMessage(
+	private void endGame(int lastLevelCompleted) throws FileNotFoundException {
+		setGameFinished(true);
+		 totalMoves += currentRoom.getMoveCount();
+		 totalTime += currentRoom.getTimeCount();
+		ImageGUI.getInstance().showMessage(
             "Vitória","Parabens! Completou todos os " + (lastLevelCompleted + 1) + " niveis!"
         );
+		// Highscores
+	    HighscoreManager hm = new HighscoreManager();
+	    hm.addScore(new ScoreEntry(totalMoves, totalTime));
+
+	    hm.showHighscoreTable(hm.getTop10());
     }
+
 	
 	
 	public void updateGUI() {
 		if(currentRoom!=null) {
 			ImageGUI.getInstance().clearImages();
 			ImageGUI.getInstance().addImages(currentRoom.getObjects());
+			ImageGUI.getInstance().setStatusMessage(
+				    "Level " + currentLevelNumber +
+				    " | Movimentos: " + currentRoom.getMoveCount() +
+				    " | Tempo: " + currentRoom.getTimeCount()
+				);
 		}
 	}
 	
 	
-	public static GameEngine getInstance() throws FileNotFoundException {
-		if(instance==null) {
-			instance=new GameEngine();
-		}
-		return instance;
+	public boolean isGameFinished() {
+	    return gameFinished;
 	}
+
+	public void setGameFinished(boolean finished) {
+	    this.gameFinished = finished;
+	}
+	
+	
+	
 	
 }

@@ -1,5 +1,7 @@
 package objects;
 
+import java.io.FileNotFoundException;
+
 import pt.iscte.poo.game.GameEngine;
 import pt.iscte.poo.game.Room;
 import pt.iscte.poo.utils.Direction;
@@ -19,7 +21,7 @@ public abstract class GameCharacter extends GameObject {
 	public boolean hasExited = false;
 	
 	
-	public void move(Vector2D dir) {
+	public void move(Vector2D dir) throws FileNotFoundException {
 	    Point2D currentPos = getPosition();
 	    Point2D destination = currentPos.plus(dir);
 
@@ -69,6 +71,10 @@ public abstract class GameCharacter extends GameObject {
 	    }
 
 	    setPosition(destination);
+	 // só conta se mexeu
+	    if (!currentPos.equals(destination)) {
+	        room.incrementMoveCount();
+	    }
 	}
 	
 	//rever

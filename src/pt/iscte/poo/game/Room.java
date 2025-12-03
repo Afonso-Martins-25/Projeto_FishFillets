@@ -15,6 +15,7 @@ import objects.Crab;
 import objects.Cup;
 import objects.GameCharacter;
 import objects.GameObject;
+import objects.GameObjectFactory;
 import objects.HoledWall;
 import objects.Pushable;
 import objects.Rock;
@@ -41,6 +42,10 @@ public class Room {
     private SmallFish smallFish = SmallFish.getInstance();
     private BigFish bigFish = BigFish.getInstance();
     private int currentLevelNumber = 0; // rastreia room0, room1, etc.
+    private int moveCount = 0;
+	private int timeCount = 0;
+
+
 	
 	public Room() {
 		objects = new ArrayList<GameObject>();
@@ -96,6 +101,30 @@ public class Room {
 		return bigFishStartingPosition;
 	}
 	
+	public int getMoveCount() { 
+		return moveCount; 
+		}
+	
+	public int getTimeCount() { 
+		return timeCount; 
+		}
+	
+	public void incrementMoveCount() { 
+		moveCount++; 
+		}
+	public void incrementTimeCount() { 
+		timeCount++; 
+		}
+	
+	// reset quando a sala é carregada
+		public void resetCounters() {
+		    moveCount = 0;
+		    timeCount = 0;
+		}
+
+
+
+	
 	
 	// 25/11/2025
 	
@@ -104,26 +133,24 @@ public class Room {
     }
 	
 	public static Room readRoom(File f, GameEngine engine, int levelNumber){
-		Room r = new Room();
-		r.setEngine(engine);
-		r.setName(f.getName());
-		r.currentLevelNumber = levelNumber;
-		
-		List<String> lines = new ArrayList<>();
-        try (Scanner sc = new Scanner(f)) {
-            while (sc.hasNextLine()) {
-                lines.add(sc.nextLine());
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Room file not found: " + f, e);
-        }
+	    Room r = new Room();
+	    r.setEngine(engine);
+	    r.setName(f.getName());
+	    r.currentLevelNumber = levelNumber;
 
-        if (lines.isEmpty()) return r;
-		
-		int width = 10;  
+	    List<String> lines = new ArrayList<>();
+	    try (Scanner sc = new Scanner(f)) {
+	        while (sc.hasNextLine()) {
+	            lines.add(sc.nextLine());
+	        }
+	    } catch (FileNotFoundException e) {
+	        throw new RuntimeException("Room file not found: " + f, e);
+	    }
+
+	    int width = 10;
 	    int height = 10;
-	    
-	    //Prencche com agua
+
+	    // Preencher com água
 	    for (int y = 0; y < height; y++) {
 	        for (int x = 0; x < width; x++) {
 	            GameObject water = new Water(r);
@@ -131,109 +158,38 @@ public class Room {
 	            r.addObject(water);
 	        }
 	    }
-		
-		
+
+	    // Criar objetos através da fábrica
 	    for (int y = 0; y < height; y++) {
-            String line = lines.get(y);
-            for (int x = 0; x < line.length(); x++) {
-                char c = line.charAt(x);
-				
-				switch(c) {
-				
-				
-			case 'W':     //Wall
-				GameObject wall = new Wall(r);
-				wall.setPosition(x,y);
-				r.addObject(wall);
-				break;
-				
-			case 'B': //BIgFish
-				GameObject bf = BigFish.getInstance();
-				bf.setPosition(x,y);
-				r.addObject(bf);
-				r.setBigFishStartingPosition(new Point2D(x, y));
-				break;
-				
-			case 'S':  //SmallFish
-				GameObject sf = SmallFish.getInstance();
-				sf.setPosition(x,y);
-				r.addObject(sf);
-				r.setSmallFishStartingPosition(new Point2D(x, y));
-				break;
-				
-			case 'H'://StellHorizontal
-				GameObject sh =new SteelHorizontal(r);
-				sh.setPosition(x,y);
-				r.addObject(sh);
-				break;
-				
-			case 'V': //SteelVertical
-				GameObject sv= new SteelVertical(r);
-				sv.setPosition(x, y);
-				r.addObject(sv);
-				break;
-				
-			case 'C': //Cup
-				GameObject cup= new Cup(r);
-				cup.setPosition(x, y);
-				r.addObject(cup);
-				break;
-				
-			case 'R'://Rock
-				GameObject rock= new Rock(r);
-				rock.setPosition(x, y);
-				r.addObject(rock);
-				break;
-			
-			case 'A'://Anchor
-				GameObject anchor= new Anchor(r);
-				anchor.setPosition(x, y);
-				r.addObject(anchor);
-				break;
-				
-			case 'b'://Bomb
-				GameObject bomb= new Bomb(r);
-				bomb.setPosition(x, y);
-				r.addObject(bomb);
-				break;
-				
-			case 'T'://Trap
-				GameObject trap= new Trap(r);
-				trap.setPosition(x, y);
-				r.addObject(trap);
-				break;
-				
-			case 'Y': //Trunk
-				GameObject t= new Trunk(r);
-				t.setPosition(x, y);
-				r.addObject(t);
-				break;
-				
-			case 'X': //HoledWall
-				GameObject hw= new HoledWall(r);
-				hw.setPosition(x, y);
-				r.addObject(hw);
-				break;
-				
-			case 'F': //Buoy
-				GameObject buoy= new Buoy(r);
-				buoy.setPosition(x, y);
-				r.addObject(buoy);
-				break;
-				
-				//Pode adicionar mais objetos
-				
-				}
-            }
+	        String line = lines.get(y);
+	        for (int x = 0; x < line.length(); x++) {
+
+	            char c = line.charAt(x);
+	            GameObject obj = GameObjectFactory.create(c, r);
+
+	            if (obj != null) {
+	                obj.setPosition(x, y);
+	                r.addObject(obj);
+
+	                if (obj instanceof BigFish)
+	                    r.setBigFishStartingPosition(new Point2D(x, y));
+
+	                if (obj instanceof SmallFish)
+	                    r.setSmallFishStartingPosition(new Point2D(x, y));
+	            }
+	        }
 	    }
-	
+
+	    // Setup dos peixes
 	    r.smallFish.setRoom(r);
-        r.bigFish.setRoom(r);
-        r.smallFish.hasExited = false;
-        r.bigFish.hasExited = false;
-        
-        return r;		
-    }
+	    r.bigFish.setRoom(r);
+	    r.smallFish.hasExited = false;
+	    r.bigFish.hasExited = false;
+	    r.resetCounters();
+	    return r;
+	}
+
+
 	
 	
 	public boolean isPositionPassable(Point2D pos, GameObject passer) {
@@ -259,7 +215,7 @@ public class Room {
 
     
     
-	public void checkLevelCompletion() {    // 25/11/2025
+	public void checkLevelCompletion() throws FileNotFoundException {    // 25/11/2025
 		if (smallFish.isExited() && bigFish.isExited()) {
 	     engine.loadNextLevel();
 		}
