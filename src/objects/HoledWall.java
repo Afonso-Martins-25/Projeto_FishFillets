@@ -1,5 +1,6 @@
 package objects;
 import pt.iscte.poo.game.Room;
+import pt.iscte.poo.utils.Point2D;
 
 
 public class HoledWall extends GameObject {
@@ -28,6 +29,11 @@ public class HoledWall extends GameObject {
 	    }
 
 	}
+	
+	public void fall() {
+    	Point2D pos = this.getPosition();
+        this.setPosition(pos.getX(), pos.getY() + 1);
+    }
 
 }
 

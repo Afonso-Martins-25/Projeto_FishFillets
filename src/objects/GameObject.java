@@ -54,11 +54,10 @@ public abstract class GameObject implements ImageTile{
 	}
 	
 	// Faz o objeto cair uma unidade para baixo
-    public void fall() {
-        Point2D pos = this.getPosition();
-        this.setPosition(pos.getX(), pos.getY() + 1);
+    public abstract void fall();
         
-    }
+        
+    
     
     public boolean hasSupport() {
         Point2D pos = this.getPosition();
@@ -81,6 +80,23 @@ public abstract class GameObject implements ImageTile{
 
         // Se o objeto abaixo NÃO for passável pelo objeto que está a cair → é suporte
         return !under.isPassable(this);
+    }
+    
+    public boolean hasSomethingUp() {
+    	Point2D pos=this.getPosition();
+    	Point2D up= new Point2D(pos.getX(), pos.getY() + -1);
+    	
+    	if(up.getY()>=10) {
+    		return true;
+    	}
+    	
+    	GameObject onTop=this.getRoom().getTopObjectAt(up);
+    	
+    	if(onTop == null || onTop instanceof Water ) {
+    		return false;
+    	}
+    	
+    	return !onTop.isPassable(this);
     }
 
 	

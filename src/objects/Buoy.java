@@ -1,5 +1,6 @@
 package objects;
 import pt.iscte.poo.game.Room;
+import pt.iscte.poo.utils.Point2D;
 import pt.iscte.poo.utils.Vector2D;
 
 
@@ -38,6 +39,11 @@ public class Buoy extends MovableObjects {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	@Override
+	public void fall() {
+    	Point2D pos = this.getPosition();
+        this.setPosition(pos.getX(), pos.getY() - 1);
+    }
 	
 	
 		

@@ -83,6 +83,10 @@ public abstract class MovableObjects extends GameObject implements Pushable{
 //	    return false;
 //	}
 	
+    public void fall() {
+    	Point2D pos = this.getPosition();
+        this.setPosition(pos.getX(), pos.getY() + 1);
+    }
 	
 	
 	

@@ -210,6 +210,9 @@ public class Room {
             if (obj.hasGravity() && obj.hasSupport()== false) {
                 obj.fall();
             }
+            if(obj instanceof Buoy && obj.hasSomethingUp()==false) {
+            	obj.fall();;
+            }
         }
     }
 
