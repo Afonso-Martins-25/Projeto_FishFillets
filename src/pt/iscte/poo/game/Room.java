@@ -207,11 +207,14 @@ public class Room {
 	// Atualiza o estado dos objetos móveis, fazendo-os cair se não houver suporte
     public void updateFallingObjects() {
         for (GameObject obj : objects) {
-            if (obj.hasGravity() && obj.hasSupport()== false) {
+        	if(!(obj instanceof Buoy)) {
+        		if (obj.hasGravity() && obj.hasSupport()== false ) {
                 obj.fall();
             }
+        	}
+            
             if(obj instanceof Buoy && obj.hasSomethingUp()==false) {
-            	obj.fall();;
+            	obj.fall();
             }
         }
     }

@@ -86,11 +86,13 @@ public abstract class GameObject implements ImageTile{
     	Point2D pos=this.getPosition();
     	Point2D up= new Point2D(pos.getX(), pos.getY() + -1);
     	
-    	if(up.getY()>=10) {
+    	if(up.getY()<0) {
     		return true;
     	}
     	
     	GameObject onTop=this.getRoom().getTopObjectAt(up);
+    	
+    	
     	
     	if(onTop == null || onTop instanceof Water ) {
     		return false;
