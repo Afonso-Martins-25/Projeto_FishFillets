@@ -29,12 +29,12 @@ public class BigFish extends GameCharacter {
 	    if (pesados > 1) return true;  // BigFish suporta só 1 pesado
 
 //	    // 2. Verificar armadilha na posição atual
-//	    GameObject top = room.getTopObjectAt(getPosition());
-//	    if (top instanceof Trap) { // armadilha = pesado
-//	        return true; 
-//	    }
+	    for (GameObject obj : room.getObjectsAt(getPosition())) {
+            if (obj instanceof Trap) return true;
+        }
+	    
+        return false;
 
-	    return false;
 	}
 	
 	@Override

@@ -38,16 +38,33 @@ public abstract class GameCharacter extends GameObject {
 	    // Verifica se há objeto na posição destino
 	    GameObject dest = room.getTopObjectAt(destination);
 	    
-	    if (dest != null && dest instanceof Pushable) {
-	    	
-	        // Tenta empurrar
-	        if (!room.tryPushObjectAt(destination, dir, this)) {
-	            return; // Não conseguiu empurrar
-	            
-	        } 
-	    } else if (dest != null && !dest.isPassable(this)) {
-		        return;
+//	    if (dest != null && dest instanceof Pushable) {
+//	    	
+//	        // Tenta empurrar
+//	        if (!room.tryPushObjectAt(destination, dir, this)) {
+//	            return; // Não conseguiu empurrar
+//	            
+//	        } 
+//	    } else if (dest != null && !dest.isPassable(this)) {
+//		        return;
+//	    }
+	    
+	    //4/12
+	    //alterei a ordem checar pushable primeiro (armadilha)
+	    if (dest != null) {
+	        if (!dest.isPassable(this)) {
+	            // Só tenta empurrar se não for passável
+	            if (dest instanceof Pushable) {
+	                if (!room.tryPushObjectAt(destination, dir, this)) {
+	                    return; // Não conseguiu empurrar
+	                }
+	            } else {
+	                return; // Bloqueia movimento
+	            }
+	        }
+	        // Se for passável, continua normalmente
 	    }
+	    
 
 	    if (isOutOfBounds(destination)) {
 	        setPosition(destination);
@@ -89,10 +106,8 @@ public abstract class GameCharacter extends GameObject {
 	    room.removeObject(this);
 
 	    if (this instanceof SmallFish || this instanceof BigFish) {
-	    	if (checkDeath()) {
 	    //		room.getEngine().restartCurrentLevel(); // mudar para endgame (perder) quando fizer
 	    		return;
-	    	}
 	    }
 
 	    room.getEngine().updateGUI();

@@ -188,13 +188,22 @@ public class Room {
 
 
 	
+	public List<GameObject> getObjectsAt(Point2D pos) {
+	    List<GameObject> objectsAtPos = new ArrayList<>();
+
+	    for (GameObject obj : objects) { 
+	        if (obj.getPosition().equals(pos)) {
+	            objectsAtPos.add(obj);
+	        }
+	    }
+
+	    return objectsAtPos;
+	}
 	
 	public boolean isPositionPassable(Point2D pos, GameObject passer) {
-	    for (GameObject obj : getObjects()) {
-	        if (obj.getPosition().equals(pos)) {
-	            if (!obj.isPassable(passer)) {
-	                return false; // barreira para este passer
-	            }
+		for (GameObject obj : getObjectsAt(pos)) {
+	        if (!obj.isPassable(passer)) {
+	            return false; // barreira para este passer
 	        }
 	    }
 	    return true; // posição livre ou passável para este passer
@@ -207,6 +216,7 @@ public class Room {
         	if(!(obj instanceof Buoy)) {
         		if (obj.hasGravity() && obj.hasSupport()== false ) {
                 obj.fall();
+                resolveHeavyObjectVsTrunk((MovableObjects) obj, obj.getPosition());
             }
         	}
             
@@ -264,8 +274,6 @@ public class Room {
             // se havia outro tipo de objecto com regras (ex: smallfish esmagada por objecto pesado), trata aqui
         }
 
-        // adicional: mover entrou numa célula com vários objectos (casos especiais)
-        // verifica também se mover foi morto pela superfície que já estava (ex: entrar numa armadilha)
         if (mover instanceof GameCharacter) {
             GameCharacter gc = (GameCharacter) mover;
             if (gc.checkDeath()) {
@@ -324,6 +332,19 @@ public class Room {
             gc.die();
         }
     }
+    
+    // Chamado quando um objeto cai ou se move para uma nova posição
+    public void resolveHeavyObjectVsTrunk(MovableObjects mover, Point2D pos) {
+    	if (!mover.isHeavy()) return; // só objetos pesados
+
+        Point2D belowPos = pos.plus(Direction.DOWN.asVector()); // posição debaixo
+        GameObject below = getTopObjectAt(belowPos);
+
+        if (below instanceof Trunk) {
+            removeObject(below);
+        }
+    }
+    
     
     
 
