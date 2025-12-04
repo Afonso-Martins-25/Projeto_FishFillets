@@ -36,29 +36,16 @@ public abstract class GameCharacter extends GameObject {
 	    }
 
 	    // Verifica se há objeto na posição destino
-	    GameObject topObj = room.getTopObjectAt(destination);
+	    GameObject dest = room.getTopObjectAt(destination);
 	    
-
-//	    if (topObj != null && topObj instanceof Pushable) {
-//	        // Tenta empurrar
-//	        if (!room.tryPushObjectAt(destination, dir, this)) {
-//	            return; // Não conseguiu empurrar
-//	        }
-//	    } else if (topObj != null && !topObj.isPassable(this)) {
-//	        return; // Não pode passar
-//	    }
-	    
-	    if (topObj != null && topObj instanceof Pushable) {
-	        // Se movimento é vertical, verifica carga acima
-	        if (isVerticalMove(dir)) {
-	            validateVerticalLoadOrDie(room);
-	        }
+	    if (dest != null && dest instanceof Pushable) {
+	    	
 	        // Tenta empurrar
 	        if (!room.tryPushObjectAt(destination, dir, this)) {
 	            return; // Não conseguiu empurrar
 	            
 	        } 
-	    } else if (topObj != null && !topObj.isPassable(this)) {
+	    } else if (dest != null && !dest.isPassable(this)) {
 		        return;
 	    }
 
@@ -70,51 +57,21 @@ public abstract class GameCharacter extends GameObject {
 	        return;
 	    }
 
+	    // Guarda quem era o top antes de mover - Para a morte (comido)
+	    GameObject topBefore = room.getTopObjectAt(destination);
+
+	    // actualiza posição
 	    setPosition(destination);
-	 // só conta se mexeu
+
+	    // só conta se mexeu
 	    if (!currentPos.equals(destination)) {
 	        room.incrementMoveCount();
 	    }
-	}
-	
-	//rever
-	private boolean isVerticalMove(Vector2D dir) {
-        return dir.equals(Direction.UP.asVector()) || dir.equals(Direction.DOWN.asVector());
-    }
 
-    private void validateVerticalLoadOrDie(Room room) {
-        if (this instanceof SmallFish) {
-            int leves = 0, pesados = 0;
-            Point2D check = getPosition().plus(Direction.UP.asVector());
-            while (check.getX() >= 0 && check.getX() < 10 && check.getY() >= 0 && check.getY() < 10) {
-                GameObject obj = room.getTopObjectAt(check);
-                if (obj instanceof MovableObjects) {
-                    MovableObjects m = (MovableObjects) obj;
-                    if (m.isHeavy()) pesados++; else leves++;
-                    check = check.plus(Direction.UP.asVector());
-                } else break;
-            }
-            if (pesados > 0 || leves > 1) {
-                room.getEngine().restartCurrentLevel();
-            }
-        } else if (this instanceof BigFish) {
-            int pesados = 0;
-            Point2D check = getPosition().plus(Direction.UP.asVector());
-            while (check.getX() >= 0 && check.getX() < 10 && check.getY() >= 0 && check.getY() < 10) {
-                GameObject obj = room.getTopObjectAt(check);
-                if (obj instanceof MovableObjects) {
-                    MovableObjects m = (MovableObjects) obj;
-                    if (m.isHeavy()) pesados++;
-                    check = check.plus(Direction.UP.asVector());
-                } else break;
-            }
-            if (pesados > 1) {
-                room.getEngine().restartCurrentLevel();
-            }
-        }
-    }
-    
-    //
+	    // Resolve entradas/colisões causadas por este mover
+	    room.resolveEntry(this, destination, topBefore);
+	    
+	}
 	
 	private boolean isOutOfBounds(Point2D pos) {
         if (pos == null) return true;
@@ -123,6 +80,25 @@ public abstract class GameCharacter extends GameObject {
         return x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT;
     }
 	
+	// override nos outros regras de peso em cima de cada peixe
+	public boolean checkDeath() {
+    	return false;
+    }
+	
+	public void die() {
+	    room.removeObject(this);
+
+	    if (this instanceof SmallFish || this instanceof BigFish) {
+	    	if (checkDeath()) {
+	    //		room.getEngine().restartCurrentLevel(); // mudar para endgame (perder) quando fizer
+	    		return;
+	    	}
+	    }
+
+	    room.getEngine().updateGUI();
+	}
+
+	
 	public void markAsExited() {
         this.hasExited = true;
     }
@@ -130,17 +106,6 @@ public abstract class GameCharacter extends GameObject {
     public boolean isExited() {
         return hasExited;
     }
-	
-
-	@Override
-	public int getLayer() {
-		return 2;
-	}
-	
-	@Override
-	public boolean isPassable(GameObject passer) {
-	    return false;
-	}
 	
 	public void fall() {
     	Point2D pos = this.getPosition();

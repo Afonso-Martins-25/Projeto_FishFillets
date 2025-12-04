@@ -1,5 +1,7 @@
 package objects;
 
+import java.util.List;
+
 import pt.iscte.poo.game.Room;
 import pt.iscte.poo.utils.Vector2D;
 
@@ -15,24 +17,25 @@ public class SmallFish extends GameCharacter {
 		return sf;
 	}
 	
-	public boolean checkSupport() {
-	    // Verifica objetos acima e aplica regras de morte
-	    int countLeves = 0;
-	    int countPesados = 0;
-	    for (GameObject obj : room.getObjects()) {
-	        if (obj.getPosition().getX() == getPosition().getX() &&
-	            obj.getPosition().getY() < getPosition().getY()) {
-	            if (obj instanceof Cup || obj instanceof Bomb) countLeves++;
-	            if (obj instanceof Rock || obj instanceof Anchor || obj instanceof Trap) countPesados++;
-	        }
+	@Override
+	public boolean checkDeath() {
+	    List<MovableObjects> carga = room.getVerticalLoadAbove(this);
+
+	    int leves = 0;
+	    int pesados = 0;
+
+	    for (MovableObjects m : carga) {
+	        if (m.isHeavy())
+	            pesados++;
+	        else
+	            leves++;
 	    }
-	    if (countPesados > 0 || countLeves > 1) {
-	        room.getEngine().restartCurrentLevel();
-	        return false;
-	    }
-	    return true;
+
+	    if (pesados > 0) return true;       // pesado mata sempre
+	    if (leves > 1) return true;         // mais de 1 leve mata
+
+	    return false;
 	}
-	
 	
 	@Override
 	public String getName() {
@@ -41,7 +44,7 @@ public class SmallFish extends GameCharacter {
 
 	@Override
 	public int getLayer() {
-		return 1;
+		return 3;
 	}
 
 }

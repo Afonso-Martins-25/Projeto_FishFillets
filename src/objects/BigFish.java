@@ -1,5 +1,7 @@
 package objects;
 
+import java.util.List;
+
 import pt.iscte.poo.game.Room;
 
 public class BigFish extends GameCharacter {
@@ -14,22 +16,25 @@ public class BigFish extends GameCharacter {
 		return bf;
 	}
 	
-	public boolean checkSupport() {
-	    int countLeves = 0;
-	    int countPesados = 0;
-	    for (GameObject obj : room.getObjects()) {
-	        if (obj.getPosition().getX() == getPosition().getX() &&
-	            obj.getPosition().getY() < getPosition().getY()) {
-	            if (obj instanceof Cup || obj instanceof Bomb) countLeves++;
-	            if (obj instanceof Rock || obj instanceof Anchor || obj instanceof Trap) countPesados++;
-	        }
+	@Override
+	public boolean checkDeath() {
+	    // 1. Verificar carga acima
+	    List<MovableObjects> carga = room.getVerticalLoadAbove(this);
+	    int pesados = 0;
+
+	    for (MovableObjects m : carga) {
+	        if (m.isHeavy()) pesados++;
 	    }
-	    // BigFish suporta vários leves ou 1 pesado
-	    if (countPesados > 1 || (countPesados == 1 && countLeves > 0)) {
-	        room.getEngine().restartCurrentLevel();
-	        return false;
-	    }
-	    return true;
+
+	    if (pesados > 1) return true;  // BigFish suporta só 1 pesado
+
+//	    // 2. Verificar armadilha na posição atual
+//	    GameObject top = room.getTopObjectAt(getPosition());
+//	    if (top instanceof Trap) { // armadilha = pesado
+//	        return true; 
+//	    }
+
+	    return false;
 	}
 	
 	@Override
@@ -39,7 +44,7 @@ public class BigFish extends GameCharacter {
 
 	@Override
 	public int getLayer() {
-		return 1;
+		return 5;
 	}
 	
 }

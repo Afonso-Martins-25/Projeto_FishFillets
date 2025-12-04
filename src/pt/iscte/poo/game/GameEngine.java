@@ -71,6 +71,7 @@ public class GameEngine implements Observer {
             } else if (Direction.isDirection(k)) {
                 try {
 					activeFish.move(Direction.directionFor(k).asVector());
+					currentRoom.updateDeaths();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}

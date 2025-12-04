@@ -18,7 +18,7 @@ public class Anchor extends MovableObjects {
 
 	@Override
 	public int getLayer() {
-		return 1;
+		return 2;
 	}
 
 	@Override

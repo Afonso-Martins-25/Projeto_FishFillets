@@ -3,7 +3,7 @@ package objects;
 import pt.iscte.poo.game.Room;
 
 
-//falta criar a atribuição da letra para a boia e o case para a construir
+//falta criar a letra e o case para o construir
 
 // apenas um por pedra quando a pedra é arrastada a primeira vez. não cria se não haver espaço em cima ---
 // move-se aleatoriamente quando os peixes mexem --- afunda ao n ser suportado -- não é empurrado -- passa a parede com buraco
@@ -21,6 +21,7 @@ public class Crab extends GameCharacter {
 		return bf;
 	}
 	
+	
 	@Override
 	public String getName() {
 		return "krab";
@@ -28,7 +29,7 @@ public class Crab extends GameCharacter {
 
 	@Override
 	public int getLayer() {
-		return 2;
+		return 4;
 	}
 	
 }

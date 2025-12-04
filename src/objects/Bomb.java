@@ -17,7 +17,7 @@ public class Bomb extends MovableObjects {
 
 	@Override
 	public int getLayer() {
-		return 1;
+		return 2;
 	}
 
 	@Override

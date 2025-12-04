@@ -19,17 +19,12 @@ public class Trap extends MovableObjects {
 
 	@Override
 	public int getLayer() {
-		return 1;
+		return 2;
 	}
 	
 	@Override
 	public boolean isPassable(GameObject passer) {
 		return true;
-	}
-	
-	@Override
-	public  boolean isPushable() {
-        return false;
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import objects.GameCharacter;
 import objects.GameObject;
 import objects.GameObjectFactory;
 import objects.HoledWall;
+import objects.MovableObjects;
 import objects.Pushable;
 import objects.Rock;
 import objects.SmallFish;
@@ -25,6 +26,7 @@ import objects.SteelVertical;
 import objects.Trap;
 import objects.Trunk;
 import objects.Wall;
+import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
 import pt.iscte.poo.utils.Vector2D;
 
@@ -38,7 +40,6 @@ public class Room {
 	private Point2D bigFishStartingPosition;
 	private final int HEIGHT = 10;
 	private final int LENGTH = 10;
-											// 25/11/2025
     private SmallFish smallFish = SmallFish.getInstance();
     private BigFish bigFish = BigFish.getInstance();
     private int currentLevelNumber = 0; // rastreia room0, room1, etc.
@@ -123,10 +124,6 @@ public class Room {
 		}
 
 
-
-	
-	
-	// 25/11/2025
 	
 	public static Room readRoom(File f, GameEngine engine) {
         return readRoom(f, engine, 0);
@@ -228,14 +225,6 @@ public class Room {
 	}      // usado no move gameCharacter não deixa criar o ciclo infinito e inicia proximo nivel.
     
     
-    
-    
-    
-
-    
-    
-    
-    
  
 	
     // devolve o objecto da layer mais alta nessa posição
@@ -259,14 +248,93 @@ public class Room {
         return x >= 0 && x < LENGTH && y >= 0 && y < HEIGHT;
     }
     
+    //4/12
+    
+    // resolve a passagem por cima de objetos (com morte)
+    public void resolveEntry(GameObject mover, Point2D pos, GameObject topBefore) {
+        // topAfter é agora o top
+        GameObject topAfter = getTopObjectAt(pos);
 
+        // se antes já tinha alguém e depois temos mover no topo -> significa que mover entrou sobre alguém
+        if (topBefore != null && topAfter == mover) {
+            // se havia um GameCharacter na layer de baixo
+            if (topBefore instanceof GameCharacter gcBelow) {
+                resolveCharacterVsCharacter(mover, gcBelow);
+            }
+            // se havia outro tipo de objecto com regras (ex: smallfish esmagada por objecto pesado), trata aqui
+        }
+
+        // adicional: mover entrou numa célula com vários objectos (casos especiais)
+        // verifica também se mover foi morto pela superfície que já estava (ex: entrar numa armadilha)
+        if (mover instanceof GameCharacter) {
+            GameCharacter gc = (GameCharacter) mover;
+            if (gc.checkDeath()) {
+                gc.die();
+            }
+        }
+    }
+    
+    // resolve a passagem por cima de personagens (com morte)
+    private void resolveCharacterVsCharacter(GameObject mover, GameCharacter stationary) {
+    	
+        if (mover.getLayer() > stationary.getLayer()) {
+            // mover passou por cima → stationary morre
+            stationary.die();
+        } else if (mover.getLayer() < stationary.getLayer()) {
+            // mover ficou por baixo do stationary → mover morre
+            if (mover instanceof GameCharacter) ((GameCharacter) mover).die();
+            
+        } else if (mover instanceof SmallFish && stationary instanceof Crab) {
+
+        	((GameCharacter) mover).die(); // small fish morre se entrar na célula com crab
+        }
+             
+    }
+    
+    public List<MovableObjects> getVerticalLoadAbove(GameObject base) {
+        List<MovableObjects> list = new ArrayList<>();
+
+        Point2D check = base.getPosition().plus(Direction.UP.asVector());
+
+        while (isInBounds(check)) {
+            GameObject obj = getTopObjectAt(check);
+            if (obj instanceof MovableObjects mov) {
+                list.add(mov);
+                check = check.plus(Direction.UP.asVector());
+            } else {
+                break;
+            }
+        }
+        return list;
+    }
+
+    
+    public void updateDeaths() {
+        List<GameCharacter> toRemove = new ArrayList<>();
+
+        for (GameObject obj : objects) {
+            if (obj instanceof GameCharacter gc) {
+                if (gc.checkDeath()) {
+                    toRemove.add(gc);
+                }
+            }
+        }
+
+        for (GameCharacter gc : toRemove) {
+            gc.die();
+        }
+    }
+    
+    
+
+    // 4/12- pooso mudar
     
     // tentativa de empurrar o objecto na posição pos em direcção dir
     public boolean tryPushObjectAt(Point2D pos, Vector2D dir, GameObject pusher) {
         for (GameObject obj : objects) {
             if (obj.getPosition().equals(pos) && obj instanceof Pushable) {
                 Pushable pushable = (Pushable) obj;
-                if (pushable.isPushable()) {
+                if (pushable.canBePushedBy(pusher, dir, this)) {
                     return pushable.push(dir, pusher);
                 }
             }

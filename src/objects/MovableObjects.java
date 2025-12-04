@@ -20,8 +20,6 @@ public abstract class MovableObjects extends GameObject implements Pushable{
 		return true;
 	}
 	
-	// descreve obrigatoriamente os movimentos para cada um dos objetos que dela derivam 
-	public abstract boolean canBePushedBy(GameObject pusher, Vector2D dir, Room room);
 	
 	public abstract boolean isHeavy(); 
 
@@ -38,11 +36,6 @@ public abstract class MovableObjects extends GameObject implements Pushable{
 	public void onExplode(Room room) {}
 	
 	
-	
-	@Override
-    public boolean isPushable() {
-        return true;
-    }
 
     @Override      //interface
     public boolean push(Vector2D dir, GameObject pusher) {
@@ -78,10 +71,6 @@ public abstract class MovableObjects extends GameObject implements Pushable{
     }
     
 	
-//	@Override
-//	public boolean isPassable(GameObject passer) {
-//	    return false;
-//	}
 	
     public void fall() {
     	Point2D pos = this.getPosition();

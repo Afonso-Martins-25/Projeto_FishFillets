@@ -17,7 +17,7 @@ public class Cup extends MovableObjects {
 
 	@Override
 	public int getLayer() {
-		return 3;  //1/12
+		return 2;
 	}
 
 	@Override
