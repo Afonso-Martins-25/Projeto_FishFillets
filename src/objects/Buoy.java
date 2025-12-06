@@ -1,5 +1,6 @@
 package objects;
 import pt.iscte.poo.game.Room;
+import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
 import pt.iscte.poo.utils.Vector2D;
 
@@ -27,18 +28,31 @@ public class Buoy extends MovableObjects {
 		return 2;
 	}
 
-	@Override  // confirmar
+	@Override
 	public boolean isHeavy() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
-	// falta fazer
 	@Override
 	public boolean canBePushedBy(GameObject pusher, Vector2D dir, Room room) {
-		// TODO Auto-generated method stub
+		
+		boolean isHorizontal = dir.equals(Direction.LEFT.asVector()) 
+                || dir.equals(Direction.RIGHT.asVector());
+
+
+		if (isHorizontal) {
+			return pusher instanceof BigFish || pusher instanceof SmallFish;
+		}
+
+		if (pusher instanceof BigFish) {
+			return true;
+		}
+		
 		return false;
-	}
+        
+    }
+
+
 	@Override
 	public void fall() {
     	Point2D pos = this.getPosition();

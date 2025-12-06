@@ -41,6 +41,14 @@ public class SmallFish extends GameCharacter {
 	public String getName() {
 		return facingRight ? "smallFishRight" : "smallFishLeft";
 	}
+	
+	@Override
+	public boolean isPassable(GameObject passer) {
+	    if (passer instanceof Crab) {
+	        return true;
+	    }
+	    return false;
+	}
 
 	@Override
 	public int getLayer() {

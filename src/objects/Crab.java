@@ -1,9 +1,9 @@
 package objects;
 
 import pt.iscte.poo.game.Room;
+import pt.iscte.poo.utils.Direction;
 
 
-//falta criar a letra e o case para o construir
 
 // apenas um por pedra quando a pedra é arrastada a primeira vez. não cria se não haver espaço em cima ---
 // move-se aleatoriamente quando os peixes mexem --- afunda ao n ser suportado -- não é empurrado -- passa a parede com buraco
@@ -13,7 +13,7 @@ public class Crab extends GameCharacter {
 
 	private static Crab bf = new Crab(null);
 	
-	private Crab(Room room) {
+	public Crab(Room room) {
 		super(room);
 	}
 
@@ -26,10 +26,15 @@ public class Crab extends GameCharacter {
 	public String getName() {
 		return "krab";
 	}
-
+	
+	public boolean isPassable(GameObject passer) {
+		return true;
+	}
+ 
 	@Override
 	public int getLayer() {
 		return 4;
 	}
+	
 	
 }

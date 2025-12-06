@@ -182,6 +182,8 @@ public class Room {
 	    r.bigFish.setRoom(r);
 	    r.smallFish.hasExited = false;
 	    r.bigFish.hasExited = false;
+	    
+	    
 	    r.resetCounters();
 	    return r;
 	}
@@ -287,7 +289,6 @@ public class Room {
             if (topBefore instanceof GameCharacter gcBelow) {
                 resolveCharacterVsCharacter(mover, gcBelow);
             }
-            // se havia outro tipo de objecto com regras (ex: smallfish esmagada por objecto pesado), trata aqui
         }
 
         if (mover instanceof GameCharacter) {
@@ -301,16 +302,38 @@ public class Room {
     // resolve a passagem por cima de personagens (com morte)
     private void resolveCharacterVsCharacter(GameObject mover, GameCharacter stationary) {
     	
+//        if (mover.getLayer() > stationary.getLayer()) {
+//            // mover passou por cima → stationary morre
+//            stationary.die();
+//        } else if (mover.getLayer() < stationary.getLayer()) {
+//            // mover ficou por baixo do stationary → mover morre
+//            if (mover instanceof GameCharacter) ((GameCharacter) mover).die();
+//            
+//        } else if (mover instanceof SmallFish && stationary instanceof Crab) {
+//
+//        	((GameCharacter) mover).die(); // small fish morre se entrar na célula com crab
+//        }
+    	
+    	// Caso especial: Crab vs SmallFish (independente de quem se move)
+        if ((mover instanceof Crab && stationary instanceof SmallFish) ||
+            (mover instanceof SmallFish && stationary instanceof Crab)) {
+            // SmallFish sempre morre
+            if (mover instanceof SmallFish) {
+                ((SmallFish) mover).die();
+            } else {
+                ((SmallFish) stationary).die();
+            }
+            return;
+        }
+        
         if (mover.getLayer() > stationary.getLayer()) {
             // mover passou por cima → stationary morre
             stationary.die();
         } else if (mover.getLayer() < stationary.getLayer()) {
             // mover ficou por baixo do stationary → mover morre
-            if (mover instanceof GameCharacter) ((GameCharacter) mover).die();
-            
-        } else if (mover instanceof SmallFish && stationary instanceof Crab) {
-
-        	((GameCharacter) mover).die(); // small fish morre se entrar na célula com crab
+            if (mover instanceof GameCharacter) {
+                ((GameCharacter) mover).die();
+            }
         }
              
     }
@@ -349,8 +372,17 @@ public class Room {
         }
     }
     
-    
-    
+    public void moveAllCrabs() throws FileNotFoundException {
+        // Cria uma cópia da lista para evitar ConcurrentModificationException
+        List<GameObject> objectsCopy = new ArrayList<>(objects);
+        
+        for (GameObject obj : objectsCopy) {
+            if (obj instanceof Crab) {
+                Crab crab = (Crab) obj;
+                crab.moveRandomHorizontally();
+            }
+        }
+    }
 
     // 4/12- pooso mudar
     

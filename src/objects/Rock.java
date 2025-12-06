@@ -1,5 +1,7 @@
 package objects;
 import pt.iscte.poo.game.Room;
+import pt.iscte.poo.utils.Direction;
+import pt.iscte.poo.utils.Point2D;
 import pt.iscte.poo.utils.Vector2D;
 
 
@@ -7,6 +9,7 @@ import pt.iscte.poo.utils.Vector2D;
 
 public class Rock extends MovableObjects {
 		
+	private boolean crabSpawned = false;
 	
 	public Rock(Room r) {
 		super(r);
@@ -40,6 +43,33 @@ public class Rock extends MovableObjects {
         return false;
     }
 	
+	@Override
+    public boolean push(Vector2D dir, GameObject pusher) {
+        // Verificar se é movimento horizontal
+        boolean isHorizontal = dir.equals(Direction.LEFT.asVector()) 
+                            || dir.equals(Direction.RIGHT.asVector());
+        
+        // Se for horizontal e caranguejo ainda não foi criado
+        if (isHorizontal && !crabSpawned) {
+            spawnCrab();
+            crabSpawned = true;
+        }
+        
+        // Chamar o push padrão da classe pai
+        return super.push(dir, pusher);
+    }
+    
+    private void spawnCrab() {
+        Room room = getRoom();
+        Point2D abovePos = getPosition().plus(Direction.UP.asVector());
+        
+        // Verificar se a posição acima existe, está dentro dos limites e está livre
+        if (room.getTopObjectAt(abovePos) instanceof Water) {
+            Crab crab = new Crab(room);
+            crab.setPosition(abovePos.getX(), abovePos.getY());
+            room.addObject(crab);
+        }
+    }
 
 	 
 }

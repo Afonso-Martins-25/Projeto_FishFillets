@@ -64,7 +64,6 @@ public abstract class GameCharacter extends GameObject {
 	        }
 	        // Se for passável, continua normalmente
 	    }
-	    
 
 	    if (isOutOfBounds(destination)) {
 	        setPosition(destination);
@@ -87,6 +86,11 @@ public abstract class GameCharacter extends GameObject {
 
 	    // Resolve entradas/colisões causadas por este mover
 	    room.resolveEntry(this, destination, topBefore);
+	    
+	 // Move todos os Crabs após um peixe se mover
+        if (this instanceof SmallFish || this instanceof BigFish) {
+            room.moveAllCrabs();
+        }
 	    
 	}
 	
@@ -125,6 +129,16 @@ public abstract class GameCharacter extends GameObject {
 	public void fall() {
     	Point2D pos = this.getPosition();
         this.setPosition(pos.getX(), pos.getY() + 1);
+    }
+	
+	public void moveRandomHorizontally() throws FileNotFoundException {
+        Direction dir = Direction.random();
+
+        while (dir == Direction.UP || dir == Direction.DOWN) {
+            dir = Direction.random();
+        }
+        
+        move(dir.asVector());
     }
 	
 }
