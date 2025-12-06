@@ -106,7 +106,7 @@ public abstract class GameCharacter extends GameObject {
 	    room.removeObject(this);
 
 	    if (this instanceof SmallFish || this instanceof BigFish) {
-	    //		room.getEngine().restartCurrentLevel(); // mudar para endgame (perder) quando fizer
+	    	    room.getEngine().endGameLoss();// mudar para endgame (perder) quando fizer
 	    		return;
 	    }
 

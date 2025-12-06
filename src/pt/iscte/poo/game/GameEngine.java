@@ -66,7 +66,11 @@ public class GameEngine implements Observer {
                 switchActiveFish();
                 
             } else if (k == java.awt.event.KeyEvent.VK_R) {
-                restartCurrentLevel();
+            	try {
+                    restartCurrentLevel();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 
             } else if (Direction.isDirection(k)) {
                 try {
@@ -104,25 +108,93 @@ public class GameEngine implements Observer {
 
 	
 	
-	// loadnextlevel semelhante a restart sugest criar um load(level)
+//	// loadnextlevel semelhante a restart sugest criar um load(level)
+//	
+//	public void loadNextLevel() throws FileNotFoundException {
+//		totalMoves += currentRoom.getMoveCount();
+//		totalTime += currentRoom.getTimeCount();
+//
+//		currentLevelNumber++;
+//        String nextRoomName = "room" + currentLevelNumber + ".txt";
+//        
+//        if (!rooms.containsKey(nextRoomName)) {
+//            // Fim de jogo: não existe próximo nível
+//            endGameWin(currentLevelNumber - 1);
+//            return;
+//        }
+//        
+//        // Carregar novo nível
+//        currentRoom = rooms.get(nextRoomName);
+//        
+//        // Resetar peixes para o novo nível
+//        SmallFish.getInstance().setRoom(currentRoom);
+//        BigFish.getInstance().setRoom(currentRoom);
+//        SmallFish.getInstance().hasExited = false;
+//        BigFish.getInstance().hasExited = false;
+//        
+//        // Posicionar peixes nas coordenadas iniciais
+//        if (currentRoom.getSmallFishStartingPosition() != null) {
+//            SmallFish.getInstance().setPosition(currentRoom.getSmallFishStartingPosition());
+//        }
+//        if (currentRoom.getBigFishStartingPosition() != null) {
+//            BigFish.getInstance().setPosition(currentRoom.getBigFishStartingPosition());
+//        }
+//        
+//        // Resetar peixe ativo e inativo
+//        activeFish = SmallFish.getInstance();
+//        inactiveFish = BigFish.getInstance();
+//        
+//        // Atualizar GUI
+//        updateGUI();
+//        ImageGUI.getInstance().setStatusMessage("Nivel " + (currentLevelNumber + 1) + " carregado");
+//    }
+//	
+//	public void restartCurrentLevel() {
+//
+//	    String currentRoomName = "room" + currentLevelNumber + ".txt";
+//	    File roomFile = new File("./rooms/" + currentRoomName);
+//
+//	    // Recarregar Room
+//	    Room reloadedRoom = Room.readRoom(roomFile, this);
+//
+//	    rooms.put(currentRoomName, reloadedRoom);
+//	    currentRoom = reloadedRoom;
+//
+//	    // Resetar estado dos peixes
+//	    SmallFish.getInstance().setRoom(currentRoom);
+//	    BigFish.getInstance().setRoom(currentRoom);
+//	    SmallFish.getInstance().hasExited = false;
+//	    BigFish.getInstance().hasExited = false;
+//
+//	    if (currentRoom.getSmallFishStartingPosition() != null) {
+//	        SmallFish.getInstance().setPosition(currentRoom.getSmallFishStartingPosition());
+//	    }
+//	    if (currentRoom.getBigFishStartingPosition() != null) {
+//	        BigFish.getInstance().setPosition(currentRoom.getBigFishStartingPosition());
+//	    }
+//
+//	    activeFish = SmallFish.getInstance();
+//	    inactiveFish = BigFish.getInstance();
+//
+//	    updateGUI();
+//	    ImageGUI.getInstance().setStatusMessage("Nivel reiniciado");
+//	}
 	
-	public void loadNextLevel() throws FileNotFoundException {
-		totalMoves += currentRoom.getMoveCount();
-		totalTime += currentRoom.getTimeCount();
-
-		currentLevelNumber++;
-        String nextRoomName = "room" + currentLevelNumber + ".txt";
+    private void loadLevel(int levelNumber, boolean isRestart) throws FileNotFoundException {
+        String roomName = "room" + levelNumber + ".txt";
         
-        if (!rooms.containsKey(nextRoomName)) {
+        if (!isRestart && !rooms.containsKey(roomName)) {
             // Fim de jogo: não existe próximo nível
-            endGame(currentLevelNumber - 1);
+            endGameWin(levelNumber - 1);
             return;
         }
         
-        // Carregar novo nível
-        currentRoom = rooms.get(nextRoomName);
+        File roomFile = new File("./rooms/" + roomName);
+        Room loadedRoom = Room.readRoom(roomFile, this);
+        rooms.put(roomName, loadedRoom);
+        currentRoom = loadedRoom;
         
-        // Resetar peixes para o novo nível
+        // Resetar estado dos peixes
         SmallFish.getInstance().setRoom(currentRoom);
         BigFish.getInstance().setRoom(currentRoom);
         SmallFish.getInstance().hasExited = false;
@@ -140,41 +212,30 @@ public class GameEngine implements Observer {
         activeFish = SmallFish.getInstance();
         inactiveFish = BigFish.getInstance();
         
+        //RESETAR O ESTADO DO JOGO-para dar reset e os objetos continuarem com gravidade mesmo com morte de peixe
+        //ou tirar setgameFinished em endloss
+        setGameFinished(false);
+        
         // Atualizar GUI
         updateGUI();
-        ImageGUI.getInstance().setStatusMessage("Nivel " + (currentLevelNumber + 1) + " carregado");
+        
+        if (isRestart) {
+            ImageGUI.getInstance().setStatusMessage("Nivel reiniciado");
+        } else {
+            ImageGUI.getInstance().setStatusMessage("Nivel " + (levelNumber + 1) + " carregado");
+        }
     }
-	
-	public void restartCurrentLevel() {
-
-	    String currentRoomName = "room" + currentLevelNumber + ".txt";
-	    File roomFile = new File("./rooms/" + currentRoomName);
-
-	    // Recarregar Room
-	    Room reloadedRoom = Room.readRoom(roomFile, this);
-
-	    rooms.put(currentRoomName, reloadedRoom);
-	    currentRoom = reloadedRoom;
-
-	    // Resetar estado dos peixes
-	    SmallFish.getInstance().setRoom(currentRoom);
-	    BigFish.getInstance().setRoom(currentRoom);
-	    SmallFish.getInstance().hasExited = false;
-	    BigFish.getInstance().hasExited = false;
-
-	    if (currentRoom.getSmallFishStartingPosition() != null) {
-	        SmallFish.getInstance().setPosition(currentRoom.getSmallFishStartingPosition());
-	    }
-	    if (currentRoom.getBigFishStartingPosition() != null) {
-	        BigFish.getInstance().setPosition(currentRoom.getBigFishStartingPosition());
-	    }
-
-	    activeFish = SmallFish.getInstance();
-	    inactiveFish = BigFish.getInstance();
-
-	    updateGUI();
-	    ImageGUI.getInstance().setStatusMessage("Nivel reiniciado");
-	}
+    
+    public void loadNextLevel() throws FileNotFoundException {
+        totalMoves += currentRoom.getMoveCount();
+        totalTime += currentRoom.getTimeCount();
+        currentLevelNumber++;
+        loadLevel(currentLevelNumber, false);
+    }
+    
+    public void restartCurrentLevel() throws FileNotFoundException {
+        loadLevel(currentLevelNumber, true);
+    }
 
 
 	
@@ -191,7 +252,7 @@ public class GameEngine implements Observer {
         updateGUI();
     }
 	
-	private void endGame(int lastLevelCompleted) throws FileNotFoundException {
+	private void endGameWin(int lastLevelCompleted) throws FileNotFoundException {
 		setGameFinished(true);
 		 totalMoves += currentRoom.getMoveCount();
 		 totalTime += currentRoom.getTimeCount();
@@ -204,6 +265,13 @@ public class GameEngine implements Observer {
 
 	    hm.showHighscoreTable(hm.getTop10());
     }
+	
+	public void endGameLoss() {
+		setGameFinished(true);
+		ImageGUI.getInstance().showMessage(
+	            "Derrota","Perdestes! Um dos peixes morreu!"
+	        );
+	}
 
 	
 	

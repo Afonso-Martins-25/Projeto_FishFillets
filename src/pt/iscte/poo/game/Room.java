@@ -212,17 +212,33 @@ public class Room {
 	
 	// Atualiza o estado dos objetos móveis, fazendo-os cair se não houver suporte
     public void updateFallingObjects() {
+    	List<GameObject> toRemove = new ArrayList<>();
+    	
         for (GameObject obj : objects) {
         	if(!(obj instanceof Buoy)) {
-        		if (obj.hasGravity() && obj.hasSupport()== false ) {
-                obj.fall();
-                resolveHeavyObjectVsTrunk((MovableObjects) obj, obj.getPosition());
-            }
+        		if (obj.hasGravity()) {
+                    // Destruir trunk ANTES de verificar suporte
+                    if (obj instanceof MovableObjects mov && mov.isHeavy()) {
+                    	GameObject below = getTopObjectAt(mov.getPosition().plus(Direction.DOWN.asVector()));
+                        if (below instanceof Trunk) {
+                            toRemove.add(below); // Marcar para remoção
+                        }
+                    }
+                    
+                    // Agora verifica suporte (com trunk já removido se aplicável)
+                    if (obj.hasSupport() == false) {
+                        obj.fall();
+                    }
+                }
         	}
             
             if(obj instanceof Buoy && obj.hasSomethingUp()==false) {
             	obj.fall();
             }
+        }
+        
+        for (GameObject obj : toRemove) {
+            removeObject(obj);
         }
     }
 
@@ -330,18 +346,6 @@ public class Room {
 
         for (GameCharacter gc : toRemove) {
             gc.die();
-        }
-    }
-    
-    // Chamado quando um objeto cai ou se move para uma nova posição
-    public void resolveHeavyObjectVsTrunk(MovableObjects mover, Point2D pos) {
-    	if (!mover.isHeavy()) return; // só objetos pesados
-
-        Point2D belowPos = pos.plus(Direction.DOWN.asVector()); // posição debaixo
-        GameObject below = getTopObjectAt(belowPos);
-
-        if (below instanceof Trunk) {
-            removeObject(below);
         }
     }
     
