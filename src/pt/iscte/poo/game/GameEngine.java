@@ -50,10 +50,19 @@ public class GameEngine implements Observer {
 	}
 
 	private void loadGame() throws FileNotFoundException  {
-		File[] files = new File("./rooms").listFiles();
-		for(File f : files) {
-			rooms.put(f.getName(),Room.readRoom(f,this));
-		}
+	    File[] files = new File("./rooms").listFiles();
+	    int levelNumber = 0;
+	    for(File f : files) {
+	        String levelStr = f.getName().replaceAll("[^0-9]", ""); // extrai o número
+	        if (!levelStr.isEmpty()) {
+	            levelNumber = Integer.parseInt(levelStr);
+	        }
+	        Room room = Room.readRoom(f, this, levelNumber);
+	        rooms.put(f.getName(), room);
+	    }
+	    
+	    // Carregar o primeiro nível
+	    loadLevel(0, false);
 	}
 
 	@Override
@@ -119,6 +128,10 @@ public class GameEngine implements Observer {
         rooms.put(roomName, loadedRoom);
         currentRoom = loadedRoom;
         
+        // Remover antigas instâncias de peixes da sala
+        currentRoom.removeObject(SmallFish.getInstance());
+        currentRoom.removeObject(BigFish.getInstance());
+        
         // Resetar estado dos peixes
         SmallFish.getInstance().setRoom(currentRoom);
         BigFish.getInstance().setRoom(currentRoom);
@@ -132,6 +145,10 @@ public class GameEngine implements Observer {
         if (currentRoom.getBigFishStartingPosition() != null) {
             BigFish.getInstance().setPosition(currentRoom.getBigFishStartingPosition());
         }
+        
+        // Adicionar os singletons à sala na posição correta
+        currentRoom.addObject(SmallFish.getInstance());
+        currentRoom.addObject(BigFish.getInstance());
         
         // Resetar peixe ativo e inativo
         activeFish = SmallFish.getInstance();

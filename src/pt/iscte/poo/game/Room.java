@@ -166,13 +166,16 @@ public class Room {
 
 	            if (obj != null) {
 	                obj.setPosition(x, y);
-	                r.addObject(obj);
-
-	                if (obj instanceof BigFish)
+	                
+	                if (obj instanceof BigFish) {
 	                    r.setBigFishStartingPosition(new Point2D(x, y));
-
-	                if (obj instanceof SmallFish)
+	                   
+	                } else if (obj instanceof SmallFish) {
 	                    r.setSmallFishStartingPosition(new Point2D(x, y));
+	                    
+	                } else {
+	                    r.addObject(obj);
+	                }
 	            }
 	        }
 	    }
@@ -183,11 +186,9 @@ public class Room {
 	    r.smallFish.hasExited = false;
 	    r.bigFish.hasExited = false;
 	    
-	    
 	    r.resetCounters();
 	    return r;
 	}
-
 
 	
 	public List<GameObject> getObjectsAt(Point2D pos) {
