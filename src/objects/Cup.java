@@ -2,7 +2,6 @@ package objects;
 import pt.iscte.poo.game.Room;
 import pt.iscte.poo.utils.Vector2D;
 
-// passa parede com buraco tbm falta acho que fiz 1/12/25
 
 public class Cup extends MovableObjects {
 	

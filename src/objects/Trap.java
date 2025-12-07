@@ -3,8 +3,6 @@ import pt.iscte.poo.game.Room;
 import pt.iscte.poo.utils.Vector2D;
 
 
-//falta coisas
-
 public class Trap extends MovableObjects {
 		
 	
@@ -24,6 +22,8 @@ public class Trap extends MovableObjects {
 	
 	@Override
 	public boolean isPassable(GameObject passer) {
+		if (passer instanceof MovableObjects)
+			return false;
 		return true;
 	}
 
@@ -32,7 +32,6 @@ public class Trap extends MovableObjects {
 		return true;
 	}
 	
-    // falta fazer
 	@Override
 	public boolean canBePushedBy(GameObject pusher, Vector2D dir, Room room) {
 		// TODO Auto-generated method stub

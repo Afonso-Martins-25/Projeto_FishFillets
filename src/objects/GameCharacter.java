@@ -10,8 +10,6 @@ import pt.iscte.poo.utils.Vector2D;
 
 public abstract class GameCharacter extends GameObject {
 	
-	private static final int GRID_WIDTH = 10;
-    private static final int GRID_HEIGHT = 10;
 	
 	public GameCharacter(Room room) {
 		super(room);
@@ -22,50 +20,34 @@ public abstract class GameCharacter extends GameObject {
 	
 	
 	public void move(Vector2D dir) throws FileNotFoundException {
-	    Point2D currentPos = getPosition();
-	    Point2D destination = currentPos.plus(dir);
-
 	    if (dir == null || room == null || isExited()) {
 	        return;
 	    }
 
+	    // Atualiza direção
 	    if (dir.equals(Direction.RIGHT.asVector())) {
 	        facingRight = true;
 	    } else if (dir.equals(Direction.LEFT.asVector())) {
 	        facingRight = false;
 	    }
 
-	    // Verifica se há objeto na posição destino
-	    GameObject dest = room.getTopObjectAt(destination);
-	    
-//	    if (dest != null && dest instanceof Pushable) {
-//	    	
-//	        // Tenta empurrar
-//	        if (!room.tryPushObjectAt(destination, dir, this)) {
-//	            return; // Não conseguiu empurrar
-//	            
-//	        } 
-//	    } else if (dest != null && !dest.isPassable(this)) {
-//		        return;
-//	    }
-	    
-	    //4/12
-	    //alterei a ordem checar pushable primeiro (armadilha)
-	    if (dest != null) {
-	        if (!dest.isPassable(this)) {
-	            // Só tenta empurrar se não for passável
-	            if (dest instanceof Pushable) {
-	                if (!room.tryPushObjectAt(destination, dir, this)) {
-	                    return; // Não conseguiu empurrar
-	                }
-	            } else {
-	                return; // Bloqueia movimento
+	    Point2D currentPos = getPosition();
+	    Point2D destination = currentPos.plus(dir);
+	    GameObject destObj = room.getTopObjectAt(destination);
+
+	    // Lida com objetos no destino
+	    if (destObj != null && !destObj.isPassable(this)) {
+	        if (destObj instanceof Pushable) {
+	            if (!room.tryPushObjectAt(destination, dir, this)) {
+	                return;
 	            }
+	        } else {
+	            return;
 	        }
-	        // Se for passável, continua normalmente
 	    }
 
-	    if (isOutOfBounds(destination)) {
+	    // Verifica saída
+	    if (!room.isInBounds(destination)) {
 	        setPosition(destination);
 	        markAsExited();
 	        room.getEngine().switchActiveFish();
@@ -73,33 +55,20 @@ public abstract class GameCharacter extends GameObject {
 	        return;
 	    }
 
-	    // Guarda quem era o top antes de mover - Para a morte (comido)
+	    // Move e resolve interações
 	    GameObject topBefore = room.getTopObjectAt(destination);
-
-	    // actualiza posição
 	    setPosition(destination);
 
-	    // só conta se mexeu
 	    if (!currentPos.equals(destination)) {
 	        room.incrementMoveCount();
 	    }
 
-	    // Resolve entradas/colisões causadas por este mover
 	    room.resolveEntry(this, destination, topBefore);
 	    
-	 // Move todos os Crabs após um peixe se mover
-        if (this instanceof SmallFish || this instanceof BigFish) {
-            room.moveAllCrabs();
-        }
-	    
+	    if (this instanceof SmallFish || this instanceof BigFish) {
+	        room.moveAllCrabs();
+	    }
 	}
-	
-	private boolean isOutOfBounds(Point2D pos) {
-        if (pos == null) return true;
-        int x = (int) pos.getX();
-        int y = (int) pos.getY();
-        return x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT;
-    }
 	
 	// override nos outros regras de peso em cima de cada peixe
 	public boolean checkDeath() {

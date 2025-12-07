@@ -22,8 +22,8 @@ public class HoledWall extends GameObject {
 	
 	@Override
 	public boolean isPassable(GameObject passer) {
-		if (passer instanceof SmallFish || passer instanceof Cup) {
-	        return true;  // pequeno e cup pode passar
+		if (passer instanceof SmallFish || passer instanceof Cup || passer instanceof Crab) {
+	        return true;  // pequeno e cup e crab pode passar
 	    } else {
 	        return false; // grande não pode passar
 	    }

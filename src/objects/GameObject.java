@@ -56,9 +56,7 @@ public abstract class GameObject implements ImageTile{
 	// Faz o objeto cair uma unidade para baixo
     public abstract void fall();
         
-        
-    
-    
+ 
     public boolean hasSupport() {
         Point2D pos = this.getPosition();
         Point2D below = new Point2D(pos.getX(), pos.getY() + 1);

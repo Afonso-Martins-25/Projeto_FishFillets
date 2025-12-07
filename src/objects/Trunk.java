@@ -2,7 +2,6 @@ package objects;
 import pt.iscte.poo.game.Room;
 import pt.iscte.poo.utils.Point2D;
 
-//falta fazer destruição
 
 public class Trunk extends GameObject {
 		

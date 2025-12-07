@@ -21,7 +21,7 @@ public class GameObjectFactory {
             case 'Y': return new Trunk(r);
             case 'X': return new HoledWall(r);
             case 'F': return new Buoy(r);
-            case 'K': return new Crab(r);
+           // case 'K': return new Crab(r);
 
             // se for água ou espaço vazio, devolve null
             default: return null;

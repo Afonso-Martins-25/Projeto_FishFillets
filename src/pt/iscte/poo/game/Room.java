@@ -189,27 +189,29 @@ public class Room {
 	    r.resetCounters();
 	    return r;
 	}
-
 	
-	public List<GameObject> getObjectsAt(Point2D pos) {
-	    List<GameObject> objectsAtPos = new ArrayList<>();
-
-	    for (GameObject obj : objects) { 
-	        if (obj.getPosition().equals(pos)) {
-	            objectsAtPos.add(obj);
-	        }
-	    }
-
-	    return objectsAtPos;
-	}
 	
 	public boolean isPositionPassable(Point2D pos, GameObject passer) {
-		for (GameObject obj : getObjectsAt(pos)) {
+//		for (GameObject obj : getObjectsAt(pos)) { // estava assim estudar erro 7/12
+		GameObject obj = getTopObjectAt(pos);
 	        if (!obj.isPassable(passer)) {
 	            return false; // barreira para este passer
 	        }
-	    }
 	    return true; // posição livre ou passável para este passer
+	}
+	
+	
+	// Retorna todos os objetos numa posicao. Ver se o bigFish e crab esta na armadilha checkDeath são removidos em
+	public List<GameObject> getObjectsAt(Point2D pos) {
+		List<GameObject> objectsAtPos = new ArrayList<>();
+
+		for (GameObject obj : objects) { 
+		    if (obj.getPosition().equals(pos)) {
+		        objectsAtPos.add(obj);
+		    }
+		}
+
+		return objectsAtPos;
 	}
 	
 	
@@ -220,6 +222,7 @@ public class Room {
         for (GameObject obj : objects) {
         	if(!(obj instanceof Buoy)) {
         		if (obj.hasGravity()) {
+        			
                     // Destruir trunk ANTES de verificar suporte
                     if (obj instanceof MovableObjects mov && mov.isHeavy()) {
                     	GameObject below = getTopObjectAt(mov.getPosition().plus(Direction.DOWN.asVector()));
@@ -246,15 +249,13 @@ public class Room {
     }
 
     
-    
-	public void checkLevelCompletion() throws FileNotFoundException {    // 25/11/2025
+    // usado no move gameCharacter inicia proximo nivel.
+	public void checkLevelCompletion() throws FileNotFoundException {
 		if (smallFish.isExited() && bigFish.isExited()) {
 	     engine.loadNextLevel();
 		}
-	}      // usado no move gameCharacter não deixa criar o ciclo infinito e inicia proximo nivel.
+	}
     
-    
- 
 	
     // devolve o objecto da layer mais alta nessa posição
     public GameObject getTopObjectAt(Point2D pos) {
@@ -270,14 +271,13 @@ public class Room {
         return top;
     }
     
-    // Validar destino antes de procurar objetos ^
-    private boolean isInBounds(Point2D pos) {
+    // Validar destino antes de procurar objetos ^ usado em gamecharacter e push
+    public boolean isInBounds(Point2D pos) {
         if (pos == null) return false;
         int x = pos.getX(), y = pos.getY();
         return x >= 0 && x < LENGTH && y >= 0 && y < HEIGHT;
     }
     
-    //4/12
     
     // resolve a passagem por cima de objetos (com morte)
     public void resolveEntry(GameObject mover, Point2D pos, GameObject topBefore) {
@@ -303,19 +303,7 @@ public class Room {
     // resolve a passagem por cima de personagens (com morte)
     private void resolveCharacterVsCharacter(GameObject mover, GameCharacter stationary) {
     	
-//        if (mover.getLayer() > stationary.getLayer()) {
-//            // mover passou por cima → stationary morre
-//            stationary.die();
-//        } else if (mover.getLayer() < stationary.getLayer()) {
-//            // mover ficou por baixo do stationary → mover morre
-//            if (mover instanceof GameCharacter) ((GameCharacter) mover).die();
-//            
-//        } else if (mover instanceof SmallFish && stationary instanceof Crab) {
-//
-//        	((GameCharacter) mover).die(); // small fish morre se entrar na célula com crab
-//        }
-    	
-    	// Caso especial: Crab vs SmallFish (independente de quem se move)
+    	// Crab vs SmallFish (independente de quem se move)
         if ((mover instanceof Crab && stationary instanceof SmallFish) ||
             (mover instanceof SmallFish && stationary instanceof Crab)) {
             // SmallFish sempre morre
@@ -339,6 +327,7 @@ public class Room {
              
     }
     
+    // Usado em checkDeath Peixes retorna lista de objetos acima
     public List<MovableObjects> getVerticalLoadAbove(GameObject base) {
         List<MovableObjects> list = new ArrayList<>();
 
@@ -356,7 +345,7 @@ public class Room {
         return list;
     }
 
-    
+    // usado em gameengine para remover de forma segura personagens mortas por peso
     public void updateDeaths() {
         List<GameCharacter> toRemove = new ArrayList<>();
 
@@ -369,12 +358,13 @@ public class Room {
         }
 
         for (GameCharacter gc : toRemove) {
-            gc.die();
+        	if (!(gc instanceof Crab))
+        		gc.die();
         }
     }
     
+    // move de forma segura todos os carangueijos
     public void moveAllCrabs() throws FileNotFoundException {
-        // Cria uma cópia da lista para evitar ConcurrentModificationException
         List<GameObject> objectsCopy = new ArrayList<>(objects);
         
         for (GameObject obj : objectsCopy) {
@@ -384,18 +374,26 @@ public class Room {
             }
         }
     }
-
-    // 4/12- pooso mudar
     
-    // tentativa de empurrar o objecto na posição pos em direcção dir
+//    // tentativa de empurrar o objecto na posição pos em direcção dir
+//    public boolean tryPushObjectAt(Point2D pos, Vector2D dir, GameObject pusher) {
+//        for (GameObject obj : objects) {
+//            if (obj.getPosition().equals(pos) && obj instanceof Pushable) {
+//                Pushable pushable = (Pushable) obj;
+//                if (pushable.canBePushedBy(pusher, dir, this)) {
+//                    return pushable.push(dir, pusher);
+//                }
+//            }
+//        }
+//        return false;
+//    }
+    
     public boolean tryPushObjectAt(Point2D pos, Vector2D dir, GameObject pusher) {
-        for (GameObject obj : objects) {
-            if (obj.getPosition().equals(pos) && obj instanceof Pushable) {
-                Pushable pushable = (Pushable) obj;
-                if (pushable.canBePushedBy(pusher, dir, this)) {
-                    return pushable.push(dir, pusher);
-                }
-            }
+        GameObject obj = getTopObjectAt(pos);
+        if (obj instanceof Pushable) {
+            Pushable pushable = (Pushable) obj;
+            return pushable.canBePushedBy(pusher, dir, this) && 
+                   pushable.push(dir, pusher);
         }
         return false;
     }

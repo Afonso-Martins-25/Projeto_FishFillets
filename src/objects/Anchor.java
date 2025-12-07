@@ -3,7 +3,6 @@ import pt.iscte.poo.game.Room;
 import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Vector2D;
 
-// so o grande movimenta
 
 public class Anchor extends MovableObjects {
 	

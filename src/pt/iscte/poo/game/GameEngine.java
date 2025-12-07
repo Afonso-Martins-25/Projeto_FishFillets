@@ -179,8 +179,7 @@ public class GameEngine implements Observer {
         loadLevel(currentLevelNumber, true);
     }
 
-
-	
+    
 	public void switchActiveFish() {
         // Validar que o outro peixe não saiu
         if (inactiveFish.isExited()) {
@@ -193,6 +192,7 @@ public class GameEngine implements Observer {
         
         updateGUI();
     }
+	
 	
 	private void endGameWin(int lastLevelCompleted) throws FileNotFoundException {
 		setGameFinished(true);
@@ -215,7 +215,6 @@ public class GameEngine implements Observer {
 	        );
 	}
 
-	
 	
 	public void updateGUI() {
 		if(currentRoom!=null) {

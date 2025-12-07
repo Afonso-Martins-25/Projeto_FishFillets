@@ -1,13 +1,10 @@
 package objects;
 
+import java.util.List;
+
 import pt.iscte.poo.game.Room;
 import pt.iscte.poo.utils.Direction;
 
-
-
-// apenas um por pedra quando a pedra é arrastada a primeira vez. não cria se não haver espaço em cima ---
-// move-se aleatoriamente quando os peixes mexem --- afunda ao n ser suportado -- não é empurrado -- passa a parede com buraco
-// mata peixe pequeno se toca nele --- é morto se passar na armadilha ou tocar no peixe grande.
 
 public class Crab extends GameCharacter {
 
@@ -21,6 +18,9 @@ public class Crab extends GameCharacter {
 		return bf;
 	}
 	
+	public boolean hasGravity() {
+		return true;
+	}
 	
 	@Override
 	public String getName() {
@@ -28,7 +28,21 @@ public class Crab extends GameCharacter {
 	}
 	
 	public boolean isPassable(GameObject passer) {
-		return true;
+		if (passer instanceof GameCharacter)
+			return true;
+		return false;
+	}
+	
+	@Override
+	public boolean checkDeath() {
+		
+	    // 2. Verificar armadilha na posição atual
+	    for (GameObject obj : room.getObjectsAt(getPosition())) {
+            if (obj instanceof Trap) return true;
+        }
+	    
+        return false;
+
 	}
  
 	@Override
