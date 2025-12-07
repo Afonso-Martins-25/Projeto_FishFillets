@@ -220,26 +220,20 @@ public class Room {
     	List<GameObject> toRemove = new ArrayList<>();
     	
         for (GameObject obj : objects) {
-        	if(!(obj instanceof Buoy)) {
-        		if (obj.hasGravity()) {
-        			
-                    // Destruir trunk ANTES de verificar suporte
-                    if (obj instanceof MovableObjects mov && mov.isHeavy()) {
-                    	GameObject below = getTopObjectAt(mov.getPosition().plus(Direction.DOWN.asVector()));
-                        if (below instanceof Trunk) {
-                            toRemove.add(below); // Marcar para remoção
-                        }
-                    }
-                    
-                    // Agora verifica suporte (com trunk já removido se aplicável)
-                    if (obj.hasSupport() == false) {
-                        obj.fall();
+        	if (obj.hasGravity()) {
+                
+                // Destruir trunk ANTES de verificar suporte
+                if (obj instanceof MovableObjects mov && mov.isHeavy()) {
+                    GameObject below = getTopObjectAt(mov.getPosition().plus(Direction.DOWN.asVector()));
+                    if (below instanceof Trunk) {
+                        toRemove.add(below); // Marcar para remoção
                     }
                 }
-        	}
-            
-            if(obj instanceof Buoy && obj.hasSomethingUp()==false) {
-            	obj.fall();
+                
+                // Agora verifica suporte (com trunk já removido se aplicável)
+                if (obj.hasSupport() == false) {
+                    obj.fall();
+                }
             }
         }
         
